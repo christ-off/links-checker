@@ -22,6 +22,7 @@
 			<groupId>org.springframework.shell</groupId>
 			<artifactId>spring-shell-starter</artifactId>
 		</dependency>
+		<!-- override because of https://github.com/advisories/GHSA-2268-98wh-qfhf -->
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline</artifactId>
@@ -33,8 +34,19 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.16.1</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<version>4.10.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
