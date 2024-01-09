@@ -46,11 +46,11 @@ public class LinksCrawlerImpl implements LinksCrawler{
 
     @Override
     public List<String> getAllBadLinks() {
-        return linksManager.getAllBadLinks();
+        return linksManager.getAllBadLinks().stream().sorted().toList();
     }
 
     @Override
     public List<String> getAllGoodLinks() {
-        return linksManager.getAllGoodLinks();
+        return linksManager.getAllGoodLinks().stream().sorted().toList();
     }
 }
