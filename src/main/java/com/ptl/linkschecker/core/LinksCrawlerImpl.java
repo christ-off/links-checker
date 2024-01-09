@@ -23,7 +23,6 @@ public class LinksCrawlerImpl implements LinksCrawler{
         linksManager.reset();
         linksManager.addNewLinks(Collections.singletonList(startUrl));
         Optional<String> urlToCheck;
-        int count = 0;
         do {
             urlToCheck = linksManager.getNextUnProcessedLink();
             if (urlToCheck.isPresent()) {
@@ -31,23 +30,18 @@ public class LinksCrawlerImpl implements LinksCrawler{
                 String realUrl;
                 if (urlToCheck.get().startsWith("/")) {
                     realUrl = startUrl + urlToCheck.get();
-                    pageResult = contentRetriever.retrievePageContent(realUrl);
-                } else if (urlToCheck.get().startsWith("#")){
-                    realUrl = startUrl + urlToCheck.get();
-                    pageResult = new PageResult("", 200);
                 } else {
                     realUrl = urlToCheck.get();
-                    pageResult = contentRetriever.retrievePageContent(realUrl);
                 }
+                pageResult = contentRetriever.retrievePageContent(realUrl);
                 if (realUrl.startsWith(startUrl)) {
                     List<String> newLinks = linkRetriever.retrieveBodyLinks(pageResult);
                     linksManager.addNewLinks(newLinks);
                 }
                 linksManager.updateLink(urlToCheck.get(), pageResult.httpStatusCode());
-                progressCounter.display(count++, "Processing");
+                progressCounter.thick();
             }
         } while ( linksManager.getNextUnProcessedLink().isPresent() );
-        progressCounter.reset();
     }
 
     @Override

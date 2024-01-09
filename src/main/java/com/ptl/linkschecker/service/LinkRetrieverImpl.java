@@ -14,7 +14,12 @@ public class LinkRetrieverImpl implements  LinkRetriever {
         if (pageContent.httpStatusCode() >= 200 && pageContent.httpStatusCode() < 300 ){
             Document doc = Jsoup.parse(pageContent.body());
             Elements links = doc.select("a");
-            return links.eachAttr("href");
+            return links.eachAttr("href")
+                    .stream()
+                    .filter( link -> !link.startsWith("#"))
+                    .map( link -> link.split("#", 2)[0])
+                    .filter( link -> !link.trim().isEmpty())
+                    .toList();
         }
         return new ArrayList<>(0);
     }

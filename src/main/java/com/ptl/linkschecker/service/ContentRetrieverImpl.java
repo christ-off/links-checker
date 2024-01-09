@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -25,8 +26,11 @@ public class ContentRetrieverImpl implements ContentRetriever {
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return new PageResult(response.body(), response.statusCode());
+        } catch (ConnectException ce){
+            log.warn("Unable to reach {}",url);
+            return new PageResult(null, 404);
         } catch (IllegalArgumentException | IOException e){
-            log.error("Error while processing {} ",url,e);
+            log.warn("Error while processing {} - {} ",url,e.getMessage());
             return new PageResult(null, 500);
         }
     }
