@@ -55,7 +55,7 @@ jobs:
         java-version: '21'
     
     - name: Build with Maven
-      run: mvn clean install --file pom.xml  
+      run: mvn -B compile  
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
