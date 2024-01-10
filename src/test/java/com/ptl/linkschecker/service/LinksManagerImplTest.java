@@ -1,31 +1,30 @@
 package com.ptl.linkschecker.service;
 
 
+import com.ptl.linkschecker.domain.PageResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 class LinksManagerImplTest {
 
     LinksManager tested = new LinksManagerImpl();
-    @SuppressWarnings({"OptionalGetWithoutIsPresent", "ConstantValue"})
     @Test
     void should_retrieve_links(){
         // GIVEN
         tested.addNewLinks(Arrays.asList("url1", "url2"));
         // WHEN
-        Optional<String> first = tested.getNextUnProcessedLink();
-        tested.updateLink(first.get(),200);
-        Optional<String> second = tested.getNextUnProcessedLink();
-        tested.updateLink(second.get(),200);
-        Optional<String> third = tested.getNextUnProcessedLink();
+        String first = tested.getNextUnProcessedLink();
+        tested.updateLink(first,200);
+        String second = tested.getNextUnProcessedLink();
+        tested.updateLink(second,200);
+        String third = tested.getNextUnProcessedLink();
         // THEN
-        Assertions.assertTrue(first.isPresent());
-        Assertions.assertTrue(second.isPresent());
-        Assertions.assertFalse(third.isPresent());
+        Assertions.assertNotNull(first);
+        Assertions.assertNotNull(second);
+        Assertions.assertNull(third);
     }
 
     @Test
@@ -33,7 +32,7 @@ class LinksManagerImplTest {
         // GIVEN
         tested.updateLink("url",200);
         // WHEN
-        List<String> good = tested.getAllGoodLinks();
+        List<PageResult> good = tested.getAllGoodLinks();
         List<String> bad = tested.getAllBadLinks();
         List<String> other = tested.getAllUntestedLinks();
         // THEN

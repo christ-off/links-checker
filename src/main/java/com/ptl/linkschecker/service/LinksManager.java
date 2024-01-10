@@ -1,19 +1,22 @@
 package com.ptl.linkschecker.service;
 
+import com.ptl.linkschecker.domain.PageResult;
+
 import java.util.List;
-import java.util.Optional;
 
 public interface LinksManager {
 
     void reset();
 
     void addNewLinks(List<String> urls);
-    Optional<String> getNextUnProcessedLink();
+    String getNextUnProcessedLink();
 
     void updateLink(String url, int httpStatusCode);
 
-    List<String> getAllGoodLinks();
+    List<PageResult> getAllGoodLinks();
     List<String> getAllBadLinks();
     List<String> getAllUntestedLinks();
+
+    long countUnprocessed();
 
 }

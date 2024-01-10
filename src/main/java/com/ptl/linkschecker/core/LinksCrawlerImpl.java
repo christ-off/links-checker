@@ -1,16 +1,17 @@
 package com.ptl.linkschecker.core;
 
 import com.ptl.linkschecker.domain.PageResult;
+import com.ptl.linkschecker.exceptions.LinksCrawlerException;
 import com.ptl.linkschecker.service.ContentRetriever;
 import com.ptl.linkschecker.service.LinkRetriever;
 import com.ptl.linkschecker.service.LinksManager;
 import com.ptl.linkschecker.utils.ProgressCounter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RequiredArgsConstructor
 public class LinksCrawlerImpl implements LinksCrawler{
@@ -19,29 +20,43 @@ public class LinksCrawlerImpl implements LinksCrawler{
     private final LinkRetriever linkRetriever;
     private final LinksManager linksManager;
 
-    public void processSite(String startUrl, ProgressCounter progressCounter) throws IOException, InterruptedException {
+    public void processSite(String startUrl, ProgressCounter progressCounter) throws LinksCrawlerException {
+        // READY
         linksManager.reset();
         linksManager.addNewLinks(Collections.singletonList(startUrl));
-        Optional<String> urlToCheck;
+        // Populate with a few links
+        processOneUrl(startUrl, progressCounter);
+        // GO for //
+        try (ExecutorService vte = Executors.newVirtualThreadPerTaskExecutor()){
+            vte.submit( () -> processOneUrl(startUrl, progressCounter));
+        }
+        // Check for completeness
+        long remaining = linksManager.countUnprocessed();
+        if (remaining > 0){
+            throw new LinksCrawlerException(remaining + " remaining links ");
+        }
+    }
+
+    private void processOneUrl(String startUrl, ProgressCounter progressCounter) {
+        String urlToCheck;
         do {
             urlToCheck = linksManager.getNextUnProcessedLink();
-            if (urlToCheck.isPresent()) {
+            if (urlToCheck != null ) {
                 PageResult pageResult;
-                String realUrl;
-                if (urlToCheck.get().startsWith("/")) {
-                    realUrl = startUrl + urlToCheck.get();
-                } else {
-                    realUrl = urlToCheck.get();
+                String realUrl = urlToCheck.startsWith("/") ? startUrl + urlToCheck : urlToCheck;
+                try {
+                    pageResult = contentRetriever.retrievePageContent(realUrl);
+                    if (realUrl.startsWith(startUrl)) {
+                        List<String> newLinks = linkRetriever.retrieveBodyLinks(pageResult);
+                        linksManager.addNewLinks(newLinks);
+                    }
+                    linksManager.updateLink(urlToCheck, pageResult.httpStatusCode());
+                } catch (InterruptedException e) {
+                    linksManager.updateLink(urlToCheck, 500);
                 }
-                pageResult = contentRetriever.retrievePageContent(realUrl);
-                if (realUrl.startsWith(startUrl)) {
-                    List<String> newLinks = linkRetriever.retrieveBodyLinks(pageResult);
-                    linksManager.addNewLinks(newLinks);
-                }
-                linksManager.updateLink(urlToCheck.get(), pageResult.httpStatusCode());
                 progressCounter.thick();
             }
-        } while ( linksManager.getNextUnProcessedLink().isPresent() );
+        } while ( urlToCheck != null );
     }
 
     @Override
@@ -50,7 +65,7 @@ public class LinksCrawlerImpl implements LinksCrawler{
     }
 
     @Override
-    public List<String> getAllGoodLinks() {
+    public List<PageResult> getAllGoodLinks() {
         return linksManager.getAllGoodLinks().stream().sorted().toList();
     }
 }

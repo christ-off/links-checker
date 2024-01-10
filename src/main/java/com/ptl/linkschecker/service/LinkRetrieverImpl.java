@@ -12,7 +12,7 @@ public class LinkRetrieverImpl implements  LinkRetriever {
 
     public List<String> retrieveBodyLinks(PageResult pageContent){
         if (pageContent.httpStatusCode() >= 200 && pageContent.httpStatusCode() < 300 ){
-            Document doc = Jsoup.parse(pageContent.body());
+            Document doc = Jsoup.parse(pageContent.content());
             Elements links = doc.select("a");
             return links.eachAttr("href")
                     .stream()

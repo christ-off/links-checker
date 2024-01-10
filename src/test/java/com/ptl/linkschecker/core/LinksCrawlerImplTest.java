@@ -1,6 +1,7 @@
 package com.ptl.linkschecker.core;
 
 import com.ptl.linkschecker.config.LinksCheckerConfig;
+import com.ptl.linkschecker.exceptions.LinksCrawlerException;
 import com.ptl.linkschecker.utils.ProgressCounter;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -35,7 +36,7 @@ class LinksCrawlerImplTest {
     }
 
     @Test
-    void should_work() throws IOException, InterruptedException {
+    void should_work() throws IOException, LinksCrawlerException {
         // GIVEN
         this.mockWebServer.start();
         String startUrl = this.mockWebServer.url("/").toString();

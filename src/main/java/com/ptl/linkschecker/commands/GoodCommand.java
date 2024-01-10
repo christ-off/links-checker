@@ -13,6 +13,6 @@ public class GoodCommand {
 
     @ShellMethod(key = "good", value = "Get all good links")
     public String good() {
-        return String.join("\n", linksCrawler.getAllGoodLinks());
+        return String.join("\n", linksCrawler.getAllGoodLinks().toString());
     }
 }
