@@ -7,6 +7,7 @@ import com.ptl.linkschecker.service.LinkRetriever;
 import com.ptl.linkschecker.service.LinksManager;
 import com.ptl.linkschecker.utils.ProgressCounter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,7 @@ public class LinksCrawlerImpl implements LinksCrawler{
         }
     }
 
+    @SneakyThrows
     private void processOneUrl(String startUrl, ProgressCounter progressCounter) {
         String urlToCheck;
         do {
@@ -55,6 +57,8 @@ public class LinksCrawlerImpl implements LinksCrawler{
                     linksManager.updateLink(urlToCheck, 500);
                 }
                 progressCounter.thick();
+            } else {
+                Thread.sleep(1000);
             }
         } while ( urlToCheck != null );
     }
