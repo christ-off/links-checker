@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 class LinkRetrieverImplTest {
 
@@ -12,7 +13,7 @@ class LinkRetrieverImplTest {
     @Test
     void should_gracefully_handle_missing_content(){
         // GIVEN
-        PageResult error404 = new PageResult("", 404);
+        PageResult error404 = new PageResult("https://www.example.com", null,404);
         // WHEN
         List<String> result = tested.retrieveBodyLinks(error404);
         // THEN
@@ -23,19 +24,23 @@ class LinkRetrieverImplTest {
     @Test
     void should_handle_simple_content(){
         // GIVEN
-        PageResult simple = new PageResult("<html><body><a href=\"https://example.com\">Link1</a></body></html>", 200);
+        PageResult simple = new PageResult("https://www.example.com",
+                Optional.of("<html><body><a href=\"https://www.example.net\">Link1</a></body></html>"),
+                200);
         // WHEN
         List<String> result = tested.retrieveBodyLinks(simple);
         // THEN
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1,result.size(), "Must retrieve one link");
-        Assertions.assertEquals("https://example.com", result.getFirst());
+        Assertions.assertEquals("https://www.example.net", result.getFirst());
     }
 
     @Test
     void should_filter_out_self_reference_link(){
         // GIVEN
-        PageResult simple = new PageResult("<html><body><a href=\"#top\">Go To Top</a></body></html>", 200);
+        PageResult simple = new PageResult("https://www.example.com",
+                Optional.of("<html><body><a href=\"#top\">Go To Top</a></body></html>"),
+                200);
         // WHEN
         List<String> result = tested.retrieveBodyLinks(simple);
         // THEN
@@ -45,7 +50,10 @@ class LinkRetrieverImplTest {
    @Test
     void should_remove_fragment_identifier(){
         // GIVEN
-        PageResult simple = new PageResult("<html><body><a href=\"/content#part1\">Go To Top</a></body></html>", 200);
+        PageResult simple = new PageResult(
+                "https://www.example.com",
+                Optional.of("<html><body><a href=\"/content#part1\">Go To Top</a></body></html>"),
+                200);
         // WHEN
         List<String> result = tested.retrieveBodyLinks(simple);
         // THEN
@@ -57,7 +65,9 @@ class LinkRetrieverImplTest {
     @Test
     void should_be_safe_from_empty_links(){
         // GIVEN
-        PageResult simple = new PageResult("<html><body><a href=\"\">Go To Top</a></body></html>", 200);
+        PageResult simple = new PageResult("https://www.example.com",
+                Optional.of("<html><body><a href=\"\">Go To Top</a></body></html>"),
+                200);
         // WHEN
         List<String> result = tested.retrieveBodyLinks(simple);
         // THEN

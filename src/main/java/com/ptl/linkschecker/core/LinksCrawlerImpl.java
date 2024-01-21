@@ -5,6 +5,7 @@ import com.ptl.linkschecker.exceptions.LinksCrawlerException;
 import com.ptl.linkschecker.service.ContentRetriever;
 import com.ptl.linkschecker.service.LinkRetriever;
 import com.ptl.linkschecker.service.LinksManager;
+import com.ptl.linkschecker.utils.LinksClassifier;
 import com.ptl.linkschecker.utils.ProgressCounter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -32,9 +33,10 @@ public class LinksCrawlerImpl implements LinksCrawler{
             vte.submit( () -> processOneUrl(startUrl, progressCounter));
         }
         // Check for completeness
-        long remaining = linksManager.countUnprocessed();
-        if (remaining > 0){
-            throw new LinksCrawlerException(remaining + " remaining links ");
+        if (linksManager
+                .getLinks().stream().anyMatch(pageResult -> LinksClassifier.isUntestedLink(pageResult.httpStatusCode()))
+                ){
+            throw new LinksCrawlerException("Remaining unprocessed links");
         }
     }
 
@@ -52,9 +54,9 @@ public class LinksCrawlerImpl implements LinksCrawler{
                         List<String> newLinks = linkRetriever.retrieveBodyLinks(pageResult);
                         linksManager.addNewLinks(newLinks);
                     }
-                    linksManager.updateLink(urlToCheck, pageResult.httpStatusCode());
+                    linksManager.updateLink(urlToCheck, pageResult.content(), pageResult.httpStatusCode());
                 } catch (InterruptedException e) {
-                    linksManager.updateLink(urlToCheck, 500);
+                    linksManager.updateLink(urlToCheck, java.util.Optional.empty(), 500);
                 }
                 progressCounter.thick();
             }
@@ -62,12 +64,8 @@ public class LinksCrawlerImpl implements LinksCrawler{
     }
 
     @Override
-    public List<String> getAllBadLinks() {
-        return linksManager.getAllBadLinks().stream().sorted().toList();
+    public List<PageResult> getLinks() {
+        return linksManager.getLinks().stream().sorted().toList();
     }
 
-    @Override
-    public List<PageResult> getAllGoodLinks() {
-        return linksManager.getAllGoodLinks().stream().sorted().toList();
-    }
 }

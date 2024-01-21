@@ -1,9 +1,11 @@
 package com.ptl.linkschecker.domain;
 
-public record PageResult(String content, int httpStatusCode) implements Comparable<PageResult> {
+import java.util.Optional;
+
+public record PageResult(String url, Optional<String> content, int httpStatusCode) implements Comparable<PageResult> {
 
     @Override
     public int compareTo(PageResult o) {
-        return this.content().compareTo(o.content());
+        return url.compareTo(o.url);
     }
 }

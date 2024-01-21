@@ -1,17 +1,17 @@
 package com.ptl.linkschecker.service;
 
 import com.ptl.linkschecker.domain.PageResult;
+import com.ptl.linkschecker.utils.LinksClassifier;
 import org.springframework.lang.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 
 public class LinksManagerImpl implements LinksManager {
 
-    private static final Integer BORROWED = 0;
-
-    private Map<String, Integer> urlToStatusMap = new HashMap<>();
+    private Map<String, PageResult> urlToStatusMap = new HashMap<>();
 
     @Override
     public void reset() {
@@ -27,48 +27,24 @@ public class LinksManagerImpl implements LinksManager {
     }
     @Nullable
     public String getNextUnProcessedLink(){
-        var first = urlToStatusMap.entrySet().stream()
+        Optional<Map.Entry<String, PageResult>> first = urlToStatusMap.entrySet().stream()
                 .filter(url -> url.getValue() == null )
                 .findFirst();
         if (first.isPresent()) {
-            first.get().setValue(BORROWED);
+            updateLink(first.get().getKey(), Optional.empty(), LinksClassifier.BORROWED);
             return first.get().getKey();
         } else {
             return null;
         }
     }
 
-    public void updateLink(String url, int httpStatusCode){
-        urlToStatusMap.put(url,httpStatusCode);
+    public void updateLink(String url, Optional<String> content, int httpStatusCode){
+        urlToStatusMap.put(url, new PageResult(url,content,httpStatusCode));
     }
 
-    private boolean isGoodLink(int httpStatus){
-        return httpStatus >= 200 && httpStatus < 300;
-    }
-    public List<PageResult> getAllGoodLinks(){
-        return urlToStatusMap.entrySet().stream()
-                .filter(url -> url.getValue() != null && isGoodLink(url.getValue()) )
-                .map( entry -> new PageResult(entry.getKey(), entry.getValue()))
-                .toList();
-    }
-    public List<String> getAllBadLinks(){
-        return urlToStatusMap.entrySet().stream()
-                .filter(url -> url.getValue() != null && !isGoodLink(url.getValue()) )
-                .map(Map.Entry::getKey)
-                .toList();
-    }
 
-    public List<String> getAllUntestedLinks(){
-        return urlToStatusMap.entrySet().stream()
-                .filter(url -> url.getValue() != null && !isGoodLink(url.getValue()) )
-                .map(Map.Entry::getKey)
-                .toList();
-    }
-
-    public long countUnprocessed(){
-        return urlToStatusMap.entrySet().stream()
-                .filter(url -> url.getValue() == null || BORROWED.equals(url.getValue()) )
-                .count();
+    public List<PageResult> getLinks(){
+        return urlToStatusMap.values().stream().toList();
     }
 
 }

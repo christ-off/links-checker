@@ -17,9 +17,7 @@ import java.net.http.HttpClient;
 public class LinksCheckerConfig {
 
     @Bean
-    public HttpClient getHttpClient(){
-        return HttpClient.newHttpClient();
-    }
+    public HttpClient getHttpClient(){ return HttpClient.newHttpClient(); }
 
     @Bean
     public ContentRetriever contentRetriever(@Autowired HttpClient client){

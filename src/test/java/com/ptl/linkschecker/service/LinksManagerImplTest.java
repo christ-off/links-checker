@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 class LinksManagerImplTest {
 
@@ -17,9 +18,9 @@ class LinksManagerImplTest {
         tested.addNewLinks(Arrays.asList("url1", "url2"));
         // WHEN
         String first = tested.getNextUnProcessedLink();
-        tested.updateLink(first,200);
+        tested.updateLink(first, Optional.of("Fake Content"), 200);
         String second = tested.getNextUnProcessedLink();
-        tested.updateLink(second,200);
+        tested.updateLink(second, Optional.of("Fake Content"), 200);
         String third = tested.getNextUnProcessedLink();
         // THEN
         Assertions.assertNotNull(first);
@@ -30,15 +31,12 @@ class LinksManagerImplTest {
     @Test
     void should_allow_update_new_links(){
         // GIVEN
-        tested.updateLink("url",200);
+        tested.updateLink("https://www.example.com", Optional.of("Fake Content"), 200);
         // WHEN
-        List<PageResult> good = tested.getAllGoodLinks();
-        List<String> bad = tested.getAllBadLinks();
-        List<String> other = tested.getAllUntestedLinks();
+        List<PageResult> links = tested.getLinks();
         // THEN
-        Assertions.assertEquals(1,good.size());
-        Assertions.assertTrue(bad.isEmpty());
-        Assertions.assertTrue(other.isEmpty());
+        Assertions.assertEquals(1,links.size());
+        Assertions.assertTrue(links.stream().allMatch(pageResult -> pageResult.httpStatusCode() == 200));
     }
 
 }

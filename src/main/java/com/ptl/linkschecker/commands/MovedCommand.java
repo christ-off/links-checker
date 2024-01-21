@@ -1,6 +1,7 @@
 package com.ptl.linkschecker.commands;
 
 import com.ptl.linkschecker.core.LinksCrawler;
+import com.ptl.linkschecker.domain.PageResult;
 import com.ptl.linkschecker.utils.LinksClassifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
@@ -10,17 +11,17 @@ import java.util.stream.Collectors;
 
 @ShellComponent
 @RequiredArgsConstructor
-public class BadCommand {
+public class MovedCommand {
 
     private final LinksCrawler linksCrawler;
 
-    @ShellMethod(key = "bad", value = "Get all bad links")
-    public String bad() {
+    @ShellMethod(key = "moved", value = "Get all moved links")
+    public String good() {
         return linksCrawler
                 .getLinks()
                 .stream()
-                .filter( pageResult -> LinksClassifier.isBadLink(pageResult.httpStatusCode()))
-                .map( pageResult -> pageResult.url() + " -> " + pageResult.httpStatusCode())
+                .filter( pageResult -> LinksClassifier.isRedirectLink(pageResult.httpStatusCode()))
+                .map( PageResult::url)
                 .collect(Collectors.joining("\n"));
     }
 }

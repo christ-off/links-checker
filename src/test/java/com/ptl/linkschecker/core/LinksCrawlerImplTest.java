@@ -1,6 +1,7 @@
 package com.ptl.linkschecker.core;
 
 import com.ptl.linkschecker.config.LinksCheckerConfig;
+import com.ptl.linkschecker.domain.PageResult;
 import com.ptl.linkschecker.exceptions.LinksCrawlerException;
 import com.ptl.linkschecker.utils.ProgressCounter;
 import okhttp3.mockwebserver.MockResponse;
@@ -16,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -36,7 +38,7 @@ class LinksCrawlerImplTest {
     }
 
     @Test
-    void should_work() throws IOException, LinksCrawlerException {
+    void should_handle_regular_content() throws IOException, LinksCrawlerException {
         // GIVEN
         this.mockWebServer.start();
         String startUrl = this.mockWebServer.url("/").toString();
@@ -44,10 +46,25 @@ class LinksCrawlerImplTest {
         this.mockWebServer.enqueue(new MockResponse().setResponseCode(404));
         // WHEN
         linksCrawler.processSite(startUrl,progressCounter);
-        List<String> bad = linksCrawler.getAllBadLinks();
+        List<PageResult> links = linksCrawler.getLinks();
         // THEN
-        Assertions.assertEquals(1,bad.size());
-        Assertions.assertEquals(startUrl+"bad", bad.getFirst());
+        Assertions.assertEquals(2,links.size());
+        // AND
+        this.mockWebServer.shutdown();
+    }
+
+    @Test
+    void should_handle_redirect() throws IOException, LinksCrawlerException {
+        // GIVEN
+        this.mockWebServer.start();
+        String startUrl = this.mockWebServer.url("/").toString();
+        this.mockWebServer.enqueue(new MockResponse().setResponseCode(302).setHeader("Location", "https://www.example.net"));
+        // WHEN
+        linksCrawler.processSite(startUrl,progressCounter);
+        List<PageResult> links = linksCrawler.getLinks();
+        // THEN
+        Assertions.assertEquals(1,links.size());
+        Assertions.assertEquals(Optional.of("https://www.example.net"), links.getFirst().content());
         // AND
         this.mockWebServer.shutdown();
     }

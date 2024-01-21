@@ -11,15 +11,18 @@ import java.util.List;
 public class LinkRetrieverImpl implements  LinkRetriever {
 
     public List<String> retrieveBodyLinks(PageResult pageContent){
-        if (pageContent.httpStatusCode() >= 200 && pageContent.httpStatusCode() < 300 ){
-            Document doc = Jsoup.parse(pageContent.content());
-            Elements links = doc.select("a");
-            return links.eachAttr("href")
-                    .stream()
-                    .filter( link -> !link.startsWith("#"))
-                    .map( link -> link.split("#", 2)[0])
-                    .filter( link -> !link.trim().isEmpty())
-                    .toList();
+        if (pageContent.httpStatusCode() >= 200
+                && pageContent.httpStatusCode() < 300
+                && (pageContent.content().isPresent())) {
+                Document doc = Jsoup.parse(pageContent.content().get());
+                Elements links = doc.select("a");
+                return links.eachAttr("href")
+                        .stream()
+                        .filter(link -> !link.startsWith("#"))
+                        .map(link -> link.split("#", 2)[0])
+                        .filter(link -> !link.trim().isEmpty())
+                        .toList();
+
         }
         return new ArrayList<>(0);
     }

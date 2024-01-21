@@ -8,6 +8,7 @@ import org.springframework.shell.command.annotation.Option;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
+
 @ShellComponent
 @RequiredArgsConstructor
 public class CheckCommand {
@@ -20,6 +21,6 @@ public class CheckCommand {
             @Option(defaultValue = "http://localhost:4000") String website
     ) throws LinksCrawlerException {
         linksCrawler.processSite(website, progressCounter);
-        return "Analyzed : " + website + " - Good " + linksCrawler.getAllGoodLinks().size() + " bad " + linksCrawler.getAllBadLinks().size();
+        return "Links : " + linksCrawler.getLinks().size();
     }
 }

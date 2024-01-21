@@ -10,6 +10,5 @@ public interface LinksCrawler {
 
     void processSite(String startUrl, ProgressCounter progressCounter) throws LinksCrawlerException;
 
-    List<String> getAllBadLinks();
-    List<PageResult> getAllGoodLinks();
+    List<PageResult> getLinks();
 }
