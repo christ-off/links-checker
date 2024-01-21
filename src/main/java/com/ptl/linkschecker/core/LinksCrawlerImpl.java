@@ -57,8 +57,6 @@ public class LinksCrawlerImpl implements LinksCrawler{
                     linksManager.updateLink(urlToCheck, 500);
                 }
                 progressCounter.thick();
-            } else {
-                Thread.sleep(1000);
             }
         } while ( urlToCheck != null );
     }
