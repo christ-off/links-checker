@@ -39,15 +39,14 @@ class LinksCrawlerImplTest {
 
     @Test
     void should_handle_regular_content() throws IOException, LinksCrawlerException {
-        // GIVEN
         this.mockWebServer.start();
         String startUrl = this.mockWebServer.url("/").toString();
         this.mockWebServer.enqueue(new MockResponse().setBody("<html><body><a href=\"" + startUrl+ "bad\">external</a></body><html>"));
         this.mockWebServer.enqueue(new MockResponse().setResponseCode(404));
-        // WHEN
+
         linksCrawler.processSite(startUrl,progressCounter);
         List<PageResult> links = linksCrawler.getLinks();
-        // THEN
+
         Assertions.assertEquals(2,links.size());
         // AND
         this.mockWebServer.shutdown();
@@ -55,17 +54,17 @@ class LinksCrawlerImplTest {
 
     @Test
     void should_handle_redirect() throws IOException, LinksCrawlerException {
-        // GIVEN
+
         this.mockWebServer.start();
         String startUrl = this.mockWebServer.url("/").toString();
         this.mockWebServer.enqueue(new MockResponse().setResponseCode(302).setHeader("Location", "https://www.example.net"));
-        // WHEN
+
         linksCrawler.processSite(startUrl,progressCounter);
         List<PageResult> links = linksCrawler.getLinks();
-        // THEN
+
         Assertions.assertEquals(1,links.size());
         Assertions.assertEquals(Optional.of("https://www.example.net"), links.getFirst().content());
-        // AND
+
         this.mockWebServer.shutdown();
     }
 }

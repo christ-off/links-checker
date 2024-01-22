@@ -25,30 +25,30 @@ class ContentRetrieverImplTest {
 
     @Test
     void should_retrieve_available_content() throws IOException, InterruptedException {
-        // GIVEN
+
         this.mockWebServer.enqueue(new MockResponse().setBody("<html><body>hello, world!</body><html>"));
         this.mockWebServer.start();
-        // WHEN
+
         PageResult result = tested.retrievePageContent(this.mockWebServer.url("/").toString());
-        // THEN
+
         Assertions.assertEquals(200,result.httpStatusCode());
         Assertions.assertTrue(result.content().isPresent());
         Assertions.assertEquals("<html><body>hello, world!</body><html>",result.content().get());
-        // AND
+
         this.mockWebServer.shutdown();
     }
 
     @Test
     void should_manage_missing_content() throws IOException, InterruptedException {
-        // GIVEN
+
         this.mockWebServer.enqueue(new MockResponse().setResponseCode(404));
         this.mockWebServer.start();
-        // WHEN
+
         PageResult result = tested.retrievePageContent(this.mockWebServer.url("/").toString());
-        // THEN
+
         Assertions.assertEquals(404,result.httpStatusCode());
-        Assertions.assertTrue(result.content().isEmpty() || "".equals(result.content().get()));
-        // AND
+        Assertions.assertTrue(result.content().isEmpty() || result.content().get().isEmpty());
+
         this.mockWebServer.shutdown();
     }
 }
