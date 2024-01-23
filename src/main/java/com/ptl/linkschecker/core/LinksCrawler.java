@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface LinksCrawler {
 
-    void processSite(String startUrl, ProgressCounter progressCounter) throws LinksCrawlerException;
+    void processSite(String startUrl, ProgressCounter progressCounter) throws LinksCrawlerException, InterruptedException;
 
     List<PageResult> getLinks();
 }

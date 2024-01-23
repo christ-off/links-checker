@@ -38,7 +38,7 @@ class LinksCrawlerImplTest {
     }
 
     @Test
-    void should_handle_regular_content() throws IOException, LinksCrawlerException {
+    void should_handle_regular_content() throws IOException, LinksCrawlerException, InterruptedException {
         this.mockWebServer.start();
         String startUrl = this.mockWebServer.url("/").toString();
         this.mockWebServer.enqueue(new MockResponse().setBody("<html><body><a href=\"" + startUrl+ "bad\">external</a></body><html>"));
@@ -53,7 +53,7 @@ class LinksCrawlerImplTest {
     }
 
     @Test
-    void should_handle_redirect() throws IOException, LinksCrawlerException {
+    void should_handle_redirect() throws IOException, LinksCrawlerException, InterruptedException {
 
         this.mockWebServer.start();
         String startUrl = this.mockWebServer.url("/").toString();

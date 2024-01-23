@@ -19,7 +19,7 @@ public class CheckCommand {
     @ShellMethod(key = "check", value = "Check the website given has an argument")
     public String check(
             @Option(defaultValue = "http://localhost:4000") String website
-    ) throws LinksCrawlerException {
+    ) throws LinksCrawlerException, InterruptedException {
         linksCrawler.processSite(website, progressCounter);
         return "Links : " + linksCrawler.getLinks().size();
     }
