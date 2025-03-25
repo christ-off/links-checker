@@ -10,7 +10,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -28,13 +27,13 @@ public class ContentRetriever {
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 301 || response.statusCode() == 302){
-                return new PageResult(url, response.headers().firstValue("Location"), response.statusCode());
+                return new PageResult(url, response.headers().firstValue("Location").orElse(null), response.statusCode());
             }
-            return new PageResult(url, Optional.ofNullable(response.body()), response.statusCode());
+            return new PageResult(url, response.body(), response.statusCode());
         } catch (ConnectException ce){
-            return new PageResult( url , Optional.of("Unable to reach url"), 404);
+            return new PageResult( url , "Unable to reach url", 404);
         } catch (IllegalArgumentException | IOException e){
-            return new PageResult( url, Optional.of(e.getMessage()), 500);
+            return new PageResult( url, e.getMessage(), 500);
         }
     }
 }

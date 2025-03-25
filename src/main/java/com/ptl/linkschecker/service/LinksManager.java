@@ -30,15 +30,15 @@ public class LinksManager {
                 .filter(url -> url.getValue() == null )
                 .findFirst();
         if (first.isPresent()) {
-            updateLink(first.get().getKey(), Optional.empty(), LinksClassifier.BORROWED);
+            updateLink(first.get().getKey(), null, LinksClassifier.BORROWED);
             return first.get().getKey();
         } else {
             return null;
         }
     }
 
-    public void updateLink(String url, Optional<String> content, int httpStatusCode){
-        urlToStatusMap.put(url, new PageResult(url,content,httpStatusCode));
+    public void updateLink(String url, @Nullable String content, int httpStatusCode){
+        urlToStatusMap.put(url, new PageResult(url, content, httpStatusCode));
     }
 
 

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 class LinkRetrieverImplTest {
 
@@ -25,7 +24,7 @@ class LinkRetrieverImplTest {
     void should_handle_simple_content(){
 
         PageResult simple = new PageResult("https://www.example.com",
-                Optional.of("<html><body><a href=\"https://www.example.net\">Link1</a></body></html>"),
+                "<html><body><a href=\"https://www.example.net\">Link1</a></body></html>",
                 200);
 
         List<String> result = tested.retrieveBodyLinks(simple);
@@ -39,7 +38,7 @@ class LinkRetrieverImplTest {
     void should_filter_out_self_reference_link(){
 
         PageResult simple = new PageResult("https://www.example.com",
-                Optional.of("<html><body><a href=\"#top\">Go To Top</a></body></html>"),
+                "<html><body><a href=\"#top\">Go To Top</a></body></html>",
                 200);
 
         List<String> result = tested.retrieveBodyLinks(simple);
@@ -52,7 +51,7 @@ class LinkRetrieverImplTest {
 
         PageResult simple = new PageResult(
                 "https://www.example.com",
-                Optional.of("<html><body><a href=\"/content#part1\">Go To Top</a></body></html>"),
+                "<html><body><a href=\"/content#part1\">Go To Top</a></body></html>",
                 200);
 
         List<String> result = tested.retrieveBodyLinks(simple);
@@ -66,7 +65,7 @@ class LinkRetrieverImplTest {
     void should_be_safe_from_empty_links(){
 
         PageResult simple = new PageResult("https://www.example.com",
-                Optional.of("<html><body><a href=\"\">Go To Top</a></body></html>"),
+                "<html><body><a href=\"\">Go To Top</a></body></html>",
                 200);
 
         List<String> result = tested.retrieveBodyLinks(simple);

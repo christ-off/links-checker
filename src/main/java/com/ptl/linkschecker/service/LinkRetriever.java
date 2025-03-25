@@ -29,7 +29,7 @@ public class LinkRetriever {
         }
 
         // Parse HTML and extract links
-        Document doc = Jsoup.parse(pageResult.content().get());
+        Document doc = Jsoup.parse(pageResult.content());
         Elements links = doc.select("a");
 
         return links.eachAttr("href")
@@ -47,6 +47,6 @@ public class LinkRetriever {
         return pageResult != null
                 && pageResult.httpStatusCode() >= HTTP_OK_MIN 
                 && pageResult.httpStatusCode() < HTTP_OK_MAX
-                && pageResult.content().isPresent();
+                && pageResult.content() != null;
     }
 }

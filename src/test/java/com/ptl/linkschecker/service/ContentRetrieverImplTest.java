@@ -32,8 +32,8 @@ class ContentRetrieverImplTest {
         PageResult result = tested.retrievePageContent(this.mockWebServer.url("/").toString());
 
         Assertions.assertEquals(200,result.httpStatusCode());
-        Assertions.assertTrue(result.content().isPresent());
-        Assertions.assertEquals("<html><body>hello, world!</body><html>",result.content().get());
+        Assertions.assertNotNull(result.content());
+        Assertions.assertEquals("<html><body>hello, world!</body><html>",result.content());
 
         this.mockWebServer.shutdown();
     }
@@ -47,7 +47,7 @@ class ContentRetrieverImplTest {
         PageResult result = tested.retrievePageContent(this.mockWebServer.url("/").toString());
 
         Assertions.assertEquals(404,result.httpStatusCode());
-        Assertions.assertTrue(result.content().isEmpty() || result.content().get().isEmpty());
+        Assertions.assertTrue(result.content() == null || result.content().isEmpty());
 
         this.mockWebServer.shutdown();
     }

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 class LinksManagerImplTest {
 
@@ -18,9 +17,9 @@ class LinksManagerImplTest {
         tested.addNewLinks(Arrays.asList("url1", "url2"));
 
         String first = tested.getNextUnProcessedLink();
-        tested.updateLink(first, Optional.of("Fake Content"), 200);
+        tested.updateLink(first, "Fake Content", 200);
         String second = tested.getNextUnProcessedLink();
-        tested.updateLink(second, Optional.of("Fake Content"), 200);
+        tested.updateLink(second, "Fake Content", 200);
         String third = tested.getNextUnProcessedLink();
 
         Assertions.assertNotNull(first);
@@ -31,7 +30,7 @@ class LinksManagerImplTest {
     @Test
     void should_allow_update_new_links(){
 
-        tested.updateLink("https://www.example.com", Optional.of("Fake Content"), 200);
+        tested.updateLink("https://www.example.com", "Fake Content", 200);
 
         List<PageResult> links = tested.getLinks();
 
