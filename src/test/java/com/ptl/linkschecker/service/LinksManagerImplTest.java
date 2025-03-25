@@ -11,7 +11,7 @@ import java.util.Optional;
 
 class LinksManagerImplTest {
 
-    LinksManager tested = new LinksManagerImpl();
+    LinksManager tested = new LinksManager();
     @Test
     void should_retrieve_links(){
 

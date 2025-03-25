@@ -9,7 +9,7 @@ import java.util.Optional;
 
 class LinkRetrieverImplTest {
 
-    private final LinkRetriever tested = new LinkRetrieverImpl();
+    private final LinkRetriever tested = new LinkRetriever();
     @Test
     void should_gracefully_handle_missing_content(){
 

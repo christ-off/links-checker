@@ -1,0 +1,8 @@
+- Use Java 21
+- Avoid Deprecated code
+- Be concise
+- Reduce number of dependencies
+- At least 90% of new or changed code must be covered by unit tests
+- When using Optional always use isPresent or isEmpty before using the values
+- Avoid code leading to possible NullPointerException
+- Do not create an Interface and a class implementing the interface if only one implementation exists 

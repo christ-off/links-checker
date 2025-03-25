@@ -20,7 +20,7 @@ class ContentRetrieverImplTest {
     @BeforeEach
     void init() {
         this.mockWebServer = new MockWebServer();
-        this.tested = new ContentRetrieverImpl(HttpClient.newHttpClient());
+        this.tested = new ContentRetriever(HttpClient.newHttpClient());
     }
 
     @Test
