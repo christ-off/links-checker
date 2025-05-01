@@ -2,7 +2,6 @@ package com.ptl.linkschecker.core;
 
 import com.ptl.linkschecker.config.LinksCheckerConfig;
 import com.ptl.linkschecker.domain.PageResult;
-import com.ptl.linkschecker.exceptions.LinksCrawlerException;
 import com.ptl.linkschecker.utils.ProgressCounter;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -17,7 +16,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -38,7 +36,7 @@ class LinksCrawlerImplTest {
     }
 
     @Test
-    void should_handle_regular_content() throws IOException, LinksCrawlerException, InterruptedException {
+    void should_handle_regular_content() throws IOException, InterruptedException {
         this.mockWebServer.start();
         String startUrl = this.mockWebServer.url("/").toString();
         this.mockWebServer.enqueue(new MockResponse().setBody("<html><body><a href=\"" + startUrl+ "bad\">external</a></body><html>"));
@@ -53,7 +51,7 @@ class LinksCrawlerImplTest {
     }
 
     @Test
-    void should_handle_redirect() throws IOException, LinksCrawlerException, InterruptedException {
+    void should_handle_redirect() throws IOException, InterruptedException {
 
         this.mockWebServer.start();
         String startUrl = this.mockWebServer.url("/").toString();
@@ -63,7 +61,7 @@ class LinksCrawlerImplTest {
         List<PageResult> links = linksCrawler.getLinks();
 
         Assertions.assertEquals(1,links.size());
-        Assertions.assertEquals(Optional.of("https://www.example.net"), links.getFirst().content());
+        Assertions.assertEquals("https://www.example.net", links.getFirst().content());
 
         this.mockWebServer.shutdown();
     }
