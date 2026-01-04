@@ -1,7 +1,6 @@
 package com.ptl.linkschecker.service;
 
 import com.ptl.linkschecker.domain.PageResult;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -11,11 +10,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-@RequiredArgsConstructor
 @Slf4j
 public class ContentRetriever {
 
     private final HttpClient httpClient;
+
+    public ContentRetriever(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
 
     public PageResult retrievePageContent(String url) throws InterruptedException {
         try {

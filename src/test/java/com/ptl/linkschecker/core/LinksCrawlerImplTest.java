@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class })
 @ContextConfiguration(classes = { LinksCheckerConfig.class })
 class LinksCrawlerImplTest {
 
@@ -57,7 +58,7 @@ class LinksCrawlerImplTest {
         String startUrl = this.mockWebServer.url("/").toString();
         this.mockWebServer.enqueue(new MockResponse().setResponseCode(302).setHeader("Location", "https://www.example.net"));
 
-        linksCrawler.processSite(startUrl,progressCounter);
+        linksCrawler.processSite(startUrl,this.progressCounter);
         List<PageResult> links = linksCrawler.getLinks();
 
         Assertions.assertEquals(1,links.size());

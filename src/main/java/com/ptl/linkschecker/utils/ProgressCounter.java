@@ -1,10 +1,8 @@
 package com.ptl.linkschecker.utils;
 
-import lombok.RequiredArgsConstructor;
 import org.jline.terminal.Terminal;
 
 // https://medium.com/agency04/developing-cli-application-with-spring-shell-part-3-b4c247fdf558
-@RequiredArgsConstructor
 public class ProgressCounter {
 
     private final Terminal terminal;
@@ -12,6 +10,10 @@ public class ProgressCounter {
     private int count;
 
     private static final int MAX_COLS = 100;
+
+    public ProgressCounter(Terminal terminal) {
+        this.terminal = terminal;
+    }
 
     public void tick() {
         terminal.writer().print(".");

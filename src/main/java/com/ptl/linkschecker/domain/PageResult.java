@@ -1,6 +1,6 @@
 package com.ptl.linkschecker.domain;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public record PageResult(String url, @Nullable String content, int httpStatusCode) implements Comparable<PageResult> {
 

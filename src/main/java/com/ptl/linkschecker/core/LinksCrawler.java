@@ -5,17 +5,21 @@ import com.ptl.linkschecker.service.ContentRetriever;
 import com.ptl.linkschecker.service.LinkRetriever;
 import com.ptl.linkschecker.service.LinksManager;
 import com.ptl.linkschecker.utils.ProgressCounter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
 
-@RequiredArgsConstructor
 public class LinksCrawler {
 
     private final ContentRetriever contentRetriever;
     private final LinkRetriever linkRetriever;
     private final LinksManager linksManager;
+
+    public LinksCrawler(ContentRetriever contentRetriever, LinkRetriever linkRetriever, LinksManager linksManager) {
+        this.contentRetriever = contentRetriever;
+        this.linkRetriever = linkRetriever;
+        this.linksManager = linksManager;
+    }
 
     public void processSite(String startUrl, ProgressCounter progressCounter) throws InterruptedException {
         linksManager.reset();

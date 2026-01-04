@@ -2,7 +2,7 @@ package com.ptl.linkschecker.service;
 
 import com.ptl.linkschecker.domain.PageResult;
 import com.ptl.linkschecker.utils.LinksClassifier;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
