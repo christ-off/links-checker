@@ -3,11 +3,9 @@ package com.ptl.linkschecker.config;
 import com.ptl.linkschecker.core.LinksCrawler;
 import com.ptl.linkschecker.service.*;
 import com.ptl.linkschecker.utils.ProgressCounter;
-import org.jline.terminal.Terminal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
 import java.net.http.HttpClient;
 
@@ -36,7 +34,5 @@ public class LinksCheckerConfig {
     }
 
     @Bean
-    public ProgressCounter progressCounter(@Lazy Terminal terminal) {
-        return new ProgressCounter(terminal);
-    }
+    public ProgressCounter progressCounter() { return new ProgressCounter(); }
 }

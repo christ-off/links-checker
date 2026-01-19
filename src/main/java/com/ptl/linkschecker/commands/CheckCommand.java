@@ -2,12 +2,11 @@ package com.ptl.linkschecker.commands;
 
 import com.ptl.linkschecker.core.LinksCrawler;
 import com.ptl.linkschecker.utils.ProgressCounter;
-import org.springframework.shell.command.annotation.Option;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.core.command.annotation.Command;
+import org.springframework.shell.core.command.annotation.Option;
+import org.springframework.stereotype.Component;
 
-
-@ShellComponent
+@Component
 public class CheckCommand {
 
     private final LinksCrawler linksCrawler;
@@ -18,9 +17,9 @@ public class CheckCommand {
         this.progressCounter = progressCounter;
     }
 
-    @ShellMethod(key = "check", value = "Check the website given has an argument")
+    @Command( name= "check", description = "Check the website given has an argument")
     public String check(
-            @Option(defaultValue = "http://localhost:4000") String website
+            @Option( longName = "website", description = "Website to crawl", defaultValue = "http://localhost:4000") String website
     ) throws InterruptedException {
         linksCrawler.processSite(website, progressCounter);
         return "Links : " + linksCrawler.getLinks().size();

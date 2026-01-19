@@ -14,13 +14,18 @@
 	<name>links-checker</name>
 	<description>Links Checker for Blog</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>25</java.version>
 		<spring-shell.version>4.0.0</spring-shell.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.shell</groupId>
+			<!--
 			<artifactId>spring-shell-starter</artifactId>
+			use spring-shell-starter instead of jansi when 4.0.1 is available
+			See https://github.com/spring-projects/spring-shell/issues/1276
+			-->
+			<artifactId>spring-shell-starter-jansi</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -72,8 +77,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.14.1</version>
 				<configuration>
-					<source>21</source>
-					<target>21</target>
+					<source>25</source>
+					<target>25</target>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -2,12 +2,12 @@ package com.ptl.linkschecker.commands;
 
 import com.ptl.linkschecker.core.LinksCrawler;
 import com.ptl.linkschecker.utils.LinksClassifier;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.core.command.annotation.Command;
+import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
-@ShellComponent
+@Component
 public class BadCommand {
 
     private final LinksCrawler linksCrawler;
@@ -16,7 +16,7 @@ public class BadCommand {
         this.linksCrawler = linksCrawler;
     }
 
-    @ShellMethod(key = "bad", value = "Get all bad links")
+    @Command( name = "bad", description = "Get all bad links")
     public String bad() {
         return linksCrawler
                 .getLinks()
