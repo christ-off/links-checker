@@ -6,8 +6,10 @@ import com.ptl.linkschecker.service.LinkRetriever;
 import com.ptl.linkschecker.service.LinksManager;
 import com.ptl.linkschecker.utils.ProgressCounter;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Phaser;
 
 public class LinksCrawler {
 
@@ -21,33 +23,38 @@ public class LinksCrawler {
         this.linksManager = linksManager;
     }
 
-    public void processSite(String startUrl, ProgressCounter progressCounter) throws InterruptedException {
+    public void processSite(String startUrl, ProgressCounter progressCounter) {
         linksManager.reset();
-        linksManager.addNewLinks(Collections.singletonList(startUrl));
-        String urlToCheck;
-        do {
-            urlToCheck = linksManager.getNextUnProcessedLink();
-            if (urlToCheck != null) {
-                PageResult pageResult;
-                String realUrl;
-                if (urlToCheck.startsWith("/")) {
-                    realUrl = startUrl + urlToCheck;
-                } else {
-                    realUrl = urlToCheck;
-                }
-                pageResult = contentRetriever.retrievePageContent(realUrl);
+        Phaser phaser = new Phaser(1);
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            submitLink(startUrl, startUrl, executor, phaser, progressCounter);
+            phaser.arriveAndDeregister();
+            phaser.awaitAdvance(0);
+        }
+    }
+
+    private void submitLink(String url, String startUrl, ExecutorService executor, Phaser phaser, ProgressCounter progressCounter) {
+        if (!linksManager.tryAdd(url)) return;
+        phaser.register();
+        executor.submit(() -> {
+            try {
+                String realUrl = url.startsWith("/") ? startUrl + url : url;
+                PageResult pageResult = contentRetriever.retrievePageContent(realUrl);
                 if (realUrl.startsWith(startUrl)) {
                     List<String> newLinks = linkRetriever.retrieveBodyLinks(pageResult);
-                    linksManager.addNewLinks(newLinks);
+                    newLinks.forEach(link -> submitLink(link, startUrl, executor, phaser, progressCounter));
                 }
-                linksManager.updateLink(urlToCheck, pageResult.content(), pageResult.httpStatusCode());
+                linksManager.updateLink(url, pageResult.content(), pageResult.httpStatusCode());
                 progressCounter.tick();
+            } catch (InterruptedException _) {
+                Thread.currentThread().interrupt();
+            } finally {
+                phaser.arriveAndDeregister();
             }
-        } while ( linksManager.getNextUnProcessedLink() != null );
+        });
     }
 
     public List<PageResult> getLinks() {
         return linksManager.getLinks().stream().sorted().toList();
     }
-
 }
