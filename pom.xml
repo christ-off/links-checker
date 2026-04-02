@@ -20,12 +20,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.shell</groupId>
-			<!--
 			<artifactId>spring-shell-starter</artifactId>
-			use spring-shell-starter instead of jansi when 4.0.1 is available
-			See https://github.com/spring-projects/spring-shell/issues/1276
-			-->
-			<artifactId>spring-shell-starter-jansi</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
