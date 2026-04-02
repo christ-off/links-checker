@@ -4,20 +4,25 @@ import com.ptl.linkschecker.core.LinksCrawler;
 import com.ptl.linkschecker.service.*;
 import com.ptl.linkschecker.utils.ProgressCounter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.net.http.HttpClient;
+import java.time.Duration;
 
 @Configuration
 public class LinksCheckerConfig {
+
+    @Value("${links-checker.request-timeout-seconds:10}")
+    private int requestTimeoutSeconds;
 
     @Bean
     public HttpClient getHttpClient(){ return HttpClient.newHttpClient(); }
 
     @Bean
     public ContentRetriever contentRetriever(@Autowired HttpClient client){
-        return new ContentRetriever(client);
+        return new ContentRetriever(client, Duration.ofSeconds(requestTimeoutSeconds));
     }
 
     @Bean

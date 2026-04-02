@@ -31,7 +31,7 @@ public class LinksCheckerApplication implements ApplicationRunner {
 		this.linksCrawler = linksCrawler;
 	}
 
-	static void main(String[] args) {
+	public static void main(String[] args) {
 		if (args.length != 1) {
 			log.error("Usage: links-checker <website>");
 			System.exit(1);

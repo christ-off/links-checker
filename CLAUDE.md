@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A Spring Boot CLI tool (using Spring Shell) that crawls a website starting from a given URL, checks all discovered links, and reports their HTTP status. Designed for checking blog/static site links before publishing.
+A Spring Boot CLI tool that crawls a website starting from a given URL, checks all discovered links, and reports their HTTP status. Designed for checking blog/static site links before publishing.
 
 ## Build & Run Commands
 
@@ -18,20 +18,22 @@ mvn test
 # Run a single test class
 mvn test -Dtest=LinksCrawlerImplTest
 
-# Run the application (interactive shell)
-java -jar target/links-checker-0.0.1-SNAPSHOT.jar
+# Run the application (requires exactly one argument: the website URL)
+java -jar target/links-checker-0.0.1-SNAPSHOT.jar <url>
 
 # Run directly via Maven
-mvn spring-boot:run
+mvn spring-boot:run -Dspring-boot.run.arguments=<url>
 ```
 
-## Shell Commands (at runtime)
+## Runtime behavior
 
-Once running, the interactive Spring Shell exposes:
-- `check --website <url>` — crawl a site (default: `http://localhost:4000`)
-- `good` — list all 2xx links from last crawl
-- `bad` — list all 4xx+ links from last crawl
-- `moved` — list all 3xx redirect links from last crawl
+The app runs non-interactively and exits after a single crawl:
+1. Crawls `<url>` and all discovered internal links
+2. Logs total link count and throughput (links/s)
+3. Logs all bad links (4xx+)
+4. Logs all moved/redirect links (3xx)
+
+If no argument is provided, it logs an error and exits with code 1.
 
 ## Architecture
 
@@ -57,7 +59,7 @@ CheckCommand → LinksCrawler
 
 ## Key Technical Details
 
-- Java 25, Spring Boot 4.0.5, Spring Shell 4.0.1
+- Java 25, Spring Boot 4.0.5 (no Spring Shell)
 - `LinksManager` is stateful and shared — call `reset()` between crawls
 - 301/302 responses: `content` field holds the `Location` header value, not the body
 - Tests use OkHttp `MockWebServer` to simulate HTTP responses
