@@ -1,3 +1,4 @@
 links-checker:
   request-timeout-seconds: 30
+  max-connections-per-host: 1
   max-parallel-requests: 5
