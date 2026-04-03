@@ -27,6 +27,11 @@ public class ContentRetriever {
 
     public PageResult retrievePageContent(String url) throws InterruptedException {
         try {
+            // Validate URL scheme to prevent SSRF
+            String scheme = URI.create(url).getScheme();
+            if (scheme == null || !scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) {
+                throw new IllegalArgumentException("Only HTTP and HTTPS URLs are allowed (SSRF protection)");
+            }
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .GET()

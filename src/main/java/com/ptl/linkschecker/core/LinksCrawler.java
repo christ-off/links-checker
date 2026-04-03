@@ -34,6 +34,8 @@ public class LinksCrawler {
     }
 
     public void processSite(String startUrl, ProgressCounter progressCounter) {
+        // Validate start URL scheme to prevent SSRF/path traversal at entry point
+        validateUrlScheme(startUrl);
         linksManager.reset();
         hostSemaphores.clear();
         Phaser phaser = new Phaser(1);
@@ -97,5 +99,17 @@ public class LinksCrawler {
 
     public List<PageResult> getLinks() {
         return linksManager.getLinks().stream().sorted().toList();
+    }
+
+    private void validateUrlScheme(String url) {
+        try {
+            var uri = URI.create(url);
+            String scheme = uri.getScheme();
+            if (scheme != null && !scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) {
+                throw new IllegalArgumentException("Only HTTP and HTTPS URLs are allowed (SSRF protection)");
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid or unsafe URL scheme: " + e.getMessage(), e);
+        }
     }
 }
