@@ -17,6 +17,9 @@ public class LinksCheckerConfig {
     @Value("${links-checker.request-timeout-seconds:10}")
     private int requestTimeoutSeconds;
 
+    @Value("${links-checker.max-parallel-requests:10}")
+    private int maxParallelRequests;
+
     @Bean
     public HttpClient getHttpClient(){ return HttpClient.newHttpClient(); }
 
@@ -35,7 +38,7 @@ public class LinksCheckerConfig {
     LinksCrawler linksCrawler(@Autowired ContentRetriever contentRetriever,
                               @Autowired LinkRetriever linkRetriever,
                               @Autowired LinksManager linksManager){
-        return new LinksCrawler(contentRetriever,linkRetriever,linksManager);
+        return new LinksCrawler(contentRetriever, linkRetriever, linksManager, maxParallelRequests);
     }
 
     @Bean

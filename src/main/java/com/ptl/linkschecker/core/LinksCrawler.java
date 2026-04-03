@@ -10,17 +10,20 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
+import java.util.concurrent.Semaphore;
 
 public class LinksCrawler {
 
     private final ContentRetriever contentRetriever;
     private final LinkRetriever linkRetriever;
     private final LinksManager linksManager;
+    private final Semaphore semaphore;
 
-    public LinksCrawler(ContentRetriever contentRetriever, LinkRetriever linkRetriever, LinksManager linksManager) {
+    public LinksCrawler(ContentRetriever contentRetriever, LinkRetriever linkRetriever, LinksManager linksManager, int maxParallelRequests) {
         this.contentRetriever = contentRetriever;
         this.linkRetriever = linkRetriever;
         this.linksManager = linksManager;
+        this.semaphore = new Semaphore(maxParallelRequests);
     }
 
     public void processSite(String startUrl, ProgressCounter progressCounter) {
@@ -39,7 +42,13 @@ public class LinksCrawler {
         executor.submit(() -> {
             try {
                 String realUrl = url.startsWith("/") ? startUrl + url : url;
-                PageResult pageResult = contentRetriever.retrievePageContent(realUrl);
+                semaphore.acquire();
+                PageResult pageResult;
+                try {
+                    pageResult = contentRetriever.retrievePageContent(realUrl);
+                } finally {
+                    semaphore.release();
+                }
                 if (realUrl.startsWith(startUrl)) {
                     List<String> newLinks = linkRetriever.retrieveBodyLinks(pageResult);
                     newLinks.forEach(link -> submitLink(link, startUrl, executor, phaser, progressCounter));

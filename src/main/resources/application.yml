@@ -1,2 +1,3 @@
 links-checker:
-  request-timeout-seconds: 10
+  request-timeout-seconds: 30
+  max-parallel-requests: 5
