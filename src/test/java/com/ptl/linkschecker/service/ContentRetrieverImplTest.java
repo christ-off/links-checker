@@ -57,6 +57,27 @@ class ContentRetrieverImplTest {
     }
 
     @Test
+    void should_extract_location_header_on_redirect() throws IOException, InterruptedException {
+
+        this.mockWebServer.enqueue(new MockResponse().setResponseCode(301).setHeader("Location", "https://new.example.com/page"));
+        this.mockWebServer.start();
+
+        PageResult result = tested.retrievePageContent(this.mockWebServer.url("/").toString());
+
+        Assertions.assertEquals(301, result.httpStatusCode());
+        Assertions.assertEquals("https://new.example.com/page", result.content());
+
+        this.mockWebServer.shutdown();
+    }
+
+    @Test
+    void should_return_500_on_invalid_url() throws InterruptedException {
+        PageResult result = tested.retrievePageContent("not-a-valid-url");
+
+        Assertions.assertEquals(500, result.httpStatusCode());
+    }
+
+    @Test
     void should_return_408_on_timeout() throws IOException, InterruptedException {
 
         this.mockWebServer.setDispatcher(new Dispatcher() {

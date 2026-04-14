@@ -38,4 +38,36 @@ class LinksManagerImplTest {
         Assertions.assertTrue(links.stream().allMatch(pageResult -> pageResult.httpStatusCode() == 200));
     }
 
+    @Test
+    void should_clear_state_on_reset() {
+        tested.updateLink("https://www.example.com", "Fake Content", 200);
+        Assertions.assertEquals(1, tested.getLinks().size());
+
+        tested.reset();
+
+        Assertions.assertEquals(0, tested.getLinks().size());
+        Assertions.assertNull(tested.getNextUnProcessedLink());
+    }
+
+    @Test
+    void tryAdd_returns_true_for_new_url() {
+        Assertions.assertTrue(tested.tryAdd("https://www.example.com"));
+    }
+
+    @Test
+    void tryAdd_returns_false_for_duplicate_url() {
+        tested.tryAdd("https://www.example.com");
+
+        Assertions.assertFalse(tested.tryAdd("https://www.example.com"));
+    }
+
+    @Test
+    void getLinks_excludes_borrowed_entries() {
+        tested.addNewLinks(Arrays.asList("https://pending.com"));
+
+        List<PageResult> links = tested.getLinks();
+
+        Assertions.assertTrue(links.isEmpty());
+    }
+
 }
