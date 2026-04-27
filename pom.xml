@@ -15,7 +15,7 @@
 	<description>Links Checker for Blog</description>
 	<properties>
 		<java.version>25</java.version>
-		<spring-shell.version>4.0.1</spring-shell.version>
+		<spring-shell.version>4.0.2</spring-shell.version>
 		<sonar.projectKey>christ-off_links-checker</sonar.projectKey>
 		<sonar.organization>christ-off</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
