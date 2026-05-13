@@ -22,7 +22,11 @@ public class ProgressCounter {
     }
 
     public void printHostStats(java.util.Map<String, Long> queriesPerHost) {
-        IO.println("\n--- QUERIES PER HOST ---");
-        queriesPerHost.forEach((host, queries) -> IO.println(host + ": " + queries));
+        IO.println("\n--- Queries per external host ---");
+        queriesPerHost.entrySet().stream()
+            .filter(e -> !e.getKey().contains("localhost"))
+            .sorted(java.util.Map.Entry.<String, Long>comparingByValue(java.util.Comparator.reverseOrder()))
+            .limit(20)
+            .forEach(e -> IO.println(e.getKey() + ": " + e.getValue()));
     }
 }
