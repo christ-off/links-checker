@@ -50,18 +50,6 @@ class LinksManagerImplTest {
     }
 
     @Test
-    void tryAdd_returns_true_for_new_url() {
-        Assertions.assertTrue(tested.tryAdd("https://www.example.com"));
-    }
-
-    @Test
-    void tryAdd_returns_false_for_duplicate_url() {
-        tested.tryAdd("https://www.example.com");
-
-        Assertions.assertFalse(tested.tryAdd("https://www.example.com"));
-    }
-
-    @Test
     void getLinks_excludes_borrowed_entries() {
         tested.addNewLinks(Arrays.asList("https://pending.com"));
 

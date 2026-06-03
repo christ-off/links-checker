@@ -1,5 +1,6 @@
 package com.ptl.linkschecker.core;
 
+import com.ptl.linkschecker.config.SkippedSites;
 import com.ptl.linkschecker.domain.PageResult;
 import com.ptl.linkschecker.service.ContentRetriever;
 import com.ptl.linkschecker.service.LinkRetriever;
@@ -10,78 +11,45 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.Semaphore;
 
 public class LinksCrawler {
 
     private final ContentRetriever contentRetriever;
     private final LinkRetriever linkRetriever;
     private final LinksManager linksManager;
-    private final int maxConnectionsPerHost;
-    private final ConcurrentHashMap<String, Semaphore> hostSemaphores = new ConcurrentHashMap<>();
-    private final Semaphore globalSemaphore;
+    private final SkippedSites skippedSites;
 
-    public LinksCrawler(ContentRetriever contentRetriever, LinkRetriever linkRetriever, LinksManager linksManager, int maxConnectionsPerHost, int maxParallelRequests) {
+    public LinksCrawler(ContentRetriever contentRetriever, LinkRetriever linkRetriever, LinksManager linksManager, SkippedSites skippedSites) {
         this.contentRetriever = contentRetriever;
         this.linkRetriever = linkRetriever;
         this.linksManager = linksManager;
-        this.maxConnectionsPerHost = maxConnectionsPerHost;
-        this.globalSemaphore = new Semaphore(maxParallelRequests);
+        this.skippedSites = skippedSites;
     }
 
     public void processSite(String startUrl, ProgressCounter progressCounter) {
-        // Validate start URL scheme to prevent SSRF/path traversal at entry point
         validateUrlScheme(startUrl);
         linksManager.reset();
-        hostSemaphores.clear();
-        Phaser phaser = new Phaser(1);
-        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            submitLink(startUrl, startUrl, executor, phaser, progressCounter);
-            phaser.arriveAndDeregister();
-            phaser.awaitAdvance(0);
-        }
-    }
+        linksManager.addNewLinks(List.of(startUrl));
 
-    private void submitLink(String url, String startUrl, ExecutorService executor, Phaser phaser, ProgressCounter progressCounter) {
-        if (!linksManager.tryAdd(url)) return;
-        phaser.register();
-        executor.submit(() -> {
-            try {
-                String realUrl = url.startsWith("/") ? startUrl + url : url;
-                Semaphore hostSemaphore = hostSemaphores.computeIfAbsent(extractHost(realUrl), _ -> new Semaphore(maxConnectionsPerHost));
-                globalSemaphore.acquire();
-                hostSemaphore.acquire();
-                PageResult pageResult;
-                try {
-                    pageResult = contentRetriever.retrievePageContent(realUrl);
-                } finally {
-                    hostSemaphore.release();
-                    globalSemaphore.release();
-                }
-                if (realUrl.startsWith(startUrl)) {
-                    List<String> newLinks = linkRetriever.retrieveBodyLinks(pageResult);
-                    newLinks.forEach(link -> submitLink(link, startUrl, executor, phaser, progressCounter));
-                }
-                linksManager.updateLink(url, pageResult.content(), pageResult.httpStatusCode());
-                progressCounter.tick(pageResult.httpStatusCode(), realUrl.startsWith(startUrl));
-            } catch (InterruptedException _) {
-                Thread.currentThread().interrupt();
-            } finally {
-                phaser.arriveAndDeregister();
+        String url;
+        while ((url = linksManager.getNextUnProcessedLink()) != null) {
+            String realUrl = url.startsWith("/") ? startUrl + url : url;
+            if (skippedSites.isSkipped(realUrl)) {
+                progressCounter.tick(0, false, true);
+                continue;
             }
-        });
-    }
-
-    private String extractHost(String url) {
-        try {
-            String host = URI.create(url).getHost();
-            return host != null ? host : url;
-        } catch (IllegalArgumentException _) {
-            return url;
+            PageResult pageResult;
+            try {
+                pageResult = contentRetriever.retrievePageContent(realUrl);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            if (realUrl.startsWith(startUrl)) {
+                linksManager.addNewLinks(linkRetriever.retrieveBodyLinks(pageResult));
+            }
+            linksManager.updateLink(url, pageResult.content(), pageResult.httpStatusCode());
+            progressCounter.tick(pageResult.httpStatusCode(), realUrl.startsWith(startUrl), false);
         }
     }
 
@@ -99,6 +67,15 @@ public class LinksCrawler {
 
     public List<PageResult> getLinks() {
         return linksManager.getLinks().stream().sorted().toList();
+    }
+
+    private String extractHost(String url) {
+        try {
+            String host = URI.create(url).getHost();
+            return host != null ? host : url;
+        } catch (IllegalArgumentException _) {
+            return url;
+        }
     }
 
     private void validateUrlScheme(String url) {

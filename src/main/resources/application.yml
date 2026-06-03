@@ -1,4 +1,10 @@
+spring:
+  main:
+    banner-mode: off
+
 links-checker:
   request-timeout-seconds: 30
-  max-connections-per-host: 1
-  max-parallel-requests: 5
+  sites-to-skip:
+    - "https://www.babelio.com"
+    - "https://www.7switch.com"
+    - "https://www.placedeslibraires.fr"

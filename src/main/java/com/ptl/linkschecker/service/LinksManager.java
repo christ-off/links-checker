@@ -4,16 +4,18 @@ import com.ptl.linkschecker.domain.PageResult;
 import com.ptl.linkschecker.utils.LinksClassifier;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Map;
 
 public class LinksManager {
 
     private static final PageResult BORROWED = new PageResult("", null, LinksClassifier.BORROWED);
 
-    private final ConcurrentHashMap<String, PageResult> urlToStatusMap = new ConcurrentHashMap<>();
-    private final LinkedBlockingQueue<String> pendingQueue = new LinkedBlockingQueue<>();
+    private final Map<String, PageResult> urlToStatusMap = new HashMap<>();
+    private final Deque<String> pendingQueue = new ArrayDeque<>();
 
     public void reset() {
         urlToStatusMap.clear();
@@ -21,19 +23,11 @@ public class LinksManager {
     }
 
     public void addNewLinks(List<String> urls) {
-        urls.forEach(url -> {
+        for (String url : urls) {
             if (urlToStatusMap.putIfAbsent(url, BORROWED) == null) {
                 pendingQueue.add(url);
             }
-        });
-    }
-
-    /**
-     * Atomically marks the url as in-progress if not already seen.
-     * Returns true if the url was newly added (caller should process it).
-     */
-    public boolean tryAdd(String url) {
-        return urlToStatusMap.putIfAbsent(url, BORROWED) == null;
+        }
     }
 
     @Nullable

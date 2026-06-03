@@ -2,22 +2,24 @@ package com.ptl.linkschecker.utils;
 
 public class ProgressCounter {
 
-    private int count;
+    private int count = 0;
 
     private static final int MAX_COLS = 100;
 
-    public void tick(int httpStatusCode, boolean internal) {
+    public void tick(int httpStatusCode, boolean internal, boolean skipped) {
         String symbol;
         if (internal) {
-            symbol = "S";
+            symbol = "I";
+        } else if (skipped) {
+            symbol = "s";
         } else {
-            if (httpStatusCode >= 500) symbol = "X";
-            else symbol = httpStatusCode >= 400 ? "x" : ".";
+            if (httpStatusCode >= 500) symbol = "5";
+            else symbol = httpStatusCode >= 400 ? "4" : ".";
         }
         IO.print(symbol);
-        count++;
-        if (count % MAX_COLS == 0){
-            IO.println(" - " + count);
+        int n = ++count;
+        if (n % MAX_COLS == 0) {
+            IO.println(" - " + n);
         }
     }
 
@@ -25,7 +27,7 @@ public class ProgressCounter {
         IO.println("\n--- Queries per external host ---");
         queriesPerHost.entrySet().stream()
             .filter(e -> !e.getKey().contains("localhost"))
-            .sorted(java.util.Map.Entry.<String, Long>comparingByValue(java.util.Comparator.reverseOrder()))
+            .sorted(java.util.Map.Entry.comparingByValue(java.util.Comparator.reverseOrder()))
             .limit(20)
             .forEach(e -> IO.println(e.getKey() + ": " + e.getValue()));
     }
