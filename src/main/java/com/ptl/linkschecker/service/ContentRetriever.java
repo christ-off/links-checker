@@ -1,13 +1,12 @@
 package com.ptl.linkschecker.service;
 
 import com.ptl.linkschecker.domain.PageResult;
+import com.ptl.linkschecker.utils.LinksClassifier;
+import com.ptl.linkschecker.utils.UrlUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.ConnectException;
-import com.ptl.linkschecker.utils.LinksClassifier;
-
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -27,13 +26,9 @@ public class ContentRetriever {
 
     public PageResult retrievePageContent(String url) throws InterruptedException {
         try {
-            // Validate URL scheme to prevent SSRF
-            String scheme = URI.create(url).getScheme();
-            if (scheme == null || !(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) {
-                throw new IllegalArgumentException("Only HTTP and HTTPS URLs are allowed (SSRF protection)");
-            }
+            UrlUtils.validateScheme(url);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
+                    .uri(java.net.URI.create(url))
                     .GET()
                     .timeout(timeout)
                     .setHeader("User-Agent",

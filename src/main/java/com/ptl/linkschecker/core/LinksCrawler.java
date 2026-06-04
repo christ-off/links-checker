@@ -6,8 +6,8 @@ import com.ptl.linkschecker.service.ContentRetriever;
 import com.ptl.linkschecker.service.LinkRetriever;
 import com.ptl.linkschecker.service.LinksManager;
 import com.ptl.linkschecker.utils.ProgressCounter;
+import com.ptl.linkschecker.utils.UrlUtils;
 
-import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class LinksCrawler {
     }
 
     public void processSite(String startUrl, ProgressCounter progressCounter) {
-        validateUrlScheme(startUrl);
+        UrlUtils.validateScheme(startUrl);
         linksManager.reset();
         linksManager.addNewLinks(List.of(startUrl));
 
@@ -56,7 +56,7 @@ public class LinksCrawler {
     public Map<String, Long> getQueriesPerHost() {
         return linksManager.getLinks().stream()
                 .collect(java.util.stream.Collectors.groupingBy(
-                        r -> extractHost(r.url()),
+                        r -> UrlUtils.extractHost(r.url()),
                         java.util.stream.Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
@@ -67,26 +67,5 @@ public class LinksCrawler {
 
     public List<PageResult> getLinks() {
         return linksManager.getLinks().stream().sorted().toList();
-    }
-
-    private String extractHost(String url) {
-        try {
-            String host = URI.create(url).getHost();
-            return host != null ? host : url;
-        } catch (IllegalArgumentException _) {
-            return url;
-        }
-    }
-
-    private void validateUrlScheme(String url) {
-        try {
-            var uri = URI.create(url);
-            String scheme = uri.getScheme();
-            if (scheme != null && !scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) {
-                throw new IllegalArgumentException("Only HTTP and HTTPS URLs are allowed (SSRF protection)");
-            }
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid or unsafe URL scheme: " + e.getMessage(), e);
-        }
     }
 }

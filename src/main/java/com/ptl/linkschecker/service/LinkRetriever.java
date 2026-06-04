@@ -13,9 +13,6 @@ import java.util.List;
  */
 public class LinkRetriever {
 
-    private static final int HTTP_OK_MIN = 200;
-    private static final int HTTP_OK_MAX = 300;
-
     /**
      * Extracts all valid links from the HTML body of a page.
      *
@@ -45,8 +42,8 @@ public class LinkRetriever {
      */
     private boolean isValidPage(PageResult pageResult) {
         return pageResult != null
-                && pageResult.httpStatusCode() >= HTTP_OK_MIN 
-                && pageResult.httpStatusCode() < HTTP_OK_MAX
+                && pageResult.httpStatusCode() >= 200
+                && pageResult.httpStatusCode() < 300
                 && pageResult.content() != null;
     }
 }

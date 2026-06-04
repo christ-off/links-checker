@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class BadCommandTest {
+class LinkListCommandTest {
 
     @Mock
     LinksCrawler linksCrawler;
 
     @InjectMocks
-    BadCommand tested;
+    LinkListCommand tested;
 
     @Test
     void should_list_bad_links() {
@@ -30,7 +30,7 @@ class BadCommandTest {
                 new PageResult("https://error.com", null, 500)
         ));
 
-        String result = tested.bad();
+        String result = tested.badLinks();
 
         assertTrue(result.contains("https://bad.com"));
         assertTrue(result.contains("404"));
@@ -45,6 +45,30 @@ class BadCommandTest {
                 new PageResult("https://ok.com", "ok", 200)
         ));
 
-        assertEquals("", tested.bad());
+        assertEquals("", tested.badLinks());
+    }
+
+    @Test
+    void should_list_moved_links() {
+        when(linksCrawler.getLinks()).thenReturn(List.of(
+                new PageResult("https://ok.com", "ok", 200),
+                new PageResult("https://moved.com", "https://new.com", 301),
+                new PageResult("https://temp.com", "https://other.com", 302)
+        ));
+
+        String result = tested.movedLinks();
+
+        assertTrue(result.contains("https://moved.com"));
+        assertTrue(result.contains("https://temp.com"));
+        assertFalse(result.contains("https://ok.com"));
+    }
+
+    @Test
+    void should_return_empty_string_when_no_redirects() {
+        when(linksCrawler.getLinks()).thenReturn(List.of(
+                new PageResult("https://ok.com", "ok", 200)
+        ));
+
+        assertEquals("", tested.movedLinks());
     }
 }

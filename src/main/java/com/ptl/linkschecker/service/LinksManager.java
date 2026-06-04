@@ -1,7 +1,6 @@
 package com.ptl.linkschecker.service;
 
 import com.ptl.linkschecker.domain.PageResult;
-import com.ptl.linkschecker.utils.LinksClassifier;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -12,7 +11,8 @@ import java.util.Map;
 
 public class LinksManager {
 
-    private static final PageResult BORROWED = new PageResult("", null, LinksClassifier.BORROWED);
+    private static final int BORROWED_STATUS = 0;
+    private static final PageResult BORROWED_SENTINEL = new PageResult("", null, BORROWED_STATUS);
 
     private final Map<String, PageResult> urlToStatusMap = new HashMap<>();
     private final Deque<String> pendingQueue = new ArrayDeque<>();
@@ -24,7 +24,7 @@ public class LinksManager {
 
     public void addNewLinks(List<String> urls) {
         for (String url : urls) {
-            if (urlToStatusMap.putIfAbsent(url, BORROWED) == null) {
+            if (urlToStatusMap.putIfAbsent(url, BORROWED_SENTINEL) == null) {
                 pendingQueue.add(url);
             }
         }
@@ -41,7 +41,7 @@ public class LinksManager {
 
     public List<PageResult> getLinks() {
         return urlToStatusMap.values().stream()
-                .filter(r -> r != BORROWED)
+                .filter(r -> r != BORROWED_SENTINEL)
                 .toList();
     }
 }

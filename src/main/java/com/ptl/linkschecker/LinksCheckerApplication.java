@@ -1,8 +1,7 @@
 package com.ptl.linkschecker;
 
-import com.ptl.linkschecker.commands.BadCommand;
 import com.ptl.linkschecker.commands.CheckCommand;
-import com.ptl.linkschecker.commands.MovedCommand;
+import com.ptl.linkschecker.commands.LinkListCommand;
 import com.ptl.linkschecker.core.LinksCrawler;
 import com.ptl.linkschecker.utils.ProgressCounter;
 import org.springframework.boot.ApplicationArguments;
@@ -17,15 +16,13 @@ import java.time.Instant;
 public class LinksCheckerApplication implements ApplicationRunner {
 
 	private final CheckCommand checkCommand;
-	private final BadCommand badCommand;
-	private final MovedCommand movedCommand;
+	private final LinkListCommand linkListCommand;
 	private final LinksCrawler linksCrawler;
 	private final ProgressCounter progressCounter;
 
-	public LinksCheckerApplication(CheckCommand checkCommand, BadCommand badCommand, MovedCommand movedCommand, LinksCrawler linksCrawler, ProgressCounter progressCounter) {
+	public LinksCheckerApplication(CheckCommand checkCommand, LinkListCommand linkListCommand, LinksCrawler linksCrawler, ProgressCounter progressCounter) {
 		this.checkCommand = checkCommand;
-		this.badCommand = badCommand;
-		this.movedCommand = movedCommand;
+		this.linkListCommand = linkListCommand;
 		this.linksCrawler = linksCrawler;
 		this.progressCounter = progressCounter;
 	}
@@ -51,8 +48,8 @@ public class LinksCheckerApplication implements ApplicationRunner {
 		IO.println("Time: " + seconds + "s | Links/s: " + linksPerSecond);
 		progressCounter.printHostStats(linksCrawler.getQueriesPerHost());
 		IO.println("--- BAD LINKS ---");
-		IO.println(badCommand.bad());
+		IO.println(linkListCommand.badLinks());
 		IO.println("--- MOVED LINKS ---");
-		IO.println(movedCommand.good());
+		IO.println(linkListCommand.movedLinks());
 	}
 }
