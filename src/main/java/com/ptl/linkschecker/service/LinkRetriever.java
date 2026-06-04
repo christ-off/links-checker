@@ -26,7 +26,8 @@ public class LinkRetriever {
         }
 
         // Parse HTML and extract links
-        Document doc = Jsoup.parse(pageResult.content());
+        String content = pageResult.content(); // already guarded by isValidPage: content != null
+        Document doc = Jsoup.parse(content);
         Elements links = doc.select("a");
 
         return links.eachAttr("href")

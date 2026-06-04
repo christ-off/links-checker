@@ -41,7 +41,7 @@ public class LinksCrawler {
             PageResult pageResult;
             try {
                 pageResult = contentRetriever.retrievePageContent(realUrl);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 Thread.currentThread().interrupt();
                 return;
             }

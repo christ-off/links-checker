@@ -18,7 +18,7 @@ public class SkippedSites {
                     if (host != null) {
                         skippedHostnames.add(host.toLowerCase(java.util.Locale.ROOT));
                     }
-                } catch (IllegalArgumentException ignored) {
+                } catch (IllegalArgumentException _) {
                 }
             }
         }
@@ -34,7 +34,7 @@ public class SkippedSites {
                     if (host != null) {
                         skippedHostnames.add(host.toLowerCase(java.util.Locale.ROOT));
                     }
-                } catch (IllegalArgumentException ignored) {
+                } catch (IllegalArgumentException _) {
                 }
             }
         }
@@ -44,7 +44,7 @@ public class SkippedSites {
         try {
             String host = URI.create(url).getHost();
             return host != null && skippedHostnames.contains(host.toLowerCase(java.util.Locale.ROOT));
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException _) {
             return false;
         }
     }
