@@ -59,7 +59,7 @@ CheckCommand → LinksCrawler
 
 ## Key Technical Details
 
-- Java 25, Spring Boot 4.0.5 (no Spring Shell)
+- Java 25, Spring Boot 4.0.6 (no Spring Shell)
 - `LinksManager` is stateful and shared — call `reset()` between crawls
 - 301/302 responses: `content` field holds the `Location` header value, not the body
 - Tests use OkHttp `MockWebServer` to simulate HTTP responses
