@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.6</version>
+		<version>4.1.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ptl</groupId>
@@ -15,7 +15,6 @@
 	<description>Links Checker for Blog</description>
 	<properties>
 		<java.version>25</java.version>
-		<spring-shell.version>4.0.2</spring-shell.version>
 		<sonar.projectKey>christ-off_links-checker</sonar.projectKey>
 		<sonar.organization>christ-off</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -54,18 +53,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.shell</groupId>
-				<artifactId>spring-shell-dependencies</artifactId>
-				<version>${spring-shell.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<build>
 		<plugins>
 			<plugin>
