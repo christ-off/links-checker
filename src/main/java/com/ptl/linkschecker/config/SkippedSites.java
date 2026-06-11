@@ -10,32 +10,25 @@ public class SkippedSites {
     private final Set<String> skippedHostnames = ConcurrentHashMap.newKeySet();
 
     public SkippedSites(List<String> sitesToSkip) {
-        if (sitesToSkip != null) {
-            for (String site : sitesToSkip) {
-                if (site == null || site.isBlank()) continue;
-                try {
-                    String host = URI.create(site.trim()).getHost();
-                    if (host != null) {
-                        skippedHostnames.add(host.toLowerCase(java.util.Locale.ROOT));
-                    }
-                } catch (IllegalArgumentException _) {
-                }
-            }
-        }
+        addSites(sitesToSkip);
     }
 
     public void setSitesToSkip(List<String> sitesToSkip) {
         skippedHostnames.clear();
-        if (sitesToSkip != null) {
-            for (String site : sitesToSkip) {
-                if (site == null || site.isBlank()) continue;
-                try {
-                    String host = URI.create(site.trim()).getHost();
-                    if (host != null) {
-                        skippedHostnames.add(host.toLowerCase(java.util.Locale.ROOT));
-                    }
-                } catch (IllegalArgumentException _) {
+        addSites(sitesToSkip);
+    }
+
+    private void addSites(List<String> sitesToSkip) {
+        if (sitesToSkip == null) return;
+        for (String site : sitesToSkip) {
+            if (site == null || site.isBlank()) continue;
+            try {
+                String host = URI.create(site.trim()).getHost();
+                if (host != null) {
+                    skippedHostnames.add(host.toLowerCase(java.util.Locale.ROOT));
                 }
+            }
+            catch (IllegalArgumentException _) {
             }
         }
     }
