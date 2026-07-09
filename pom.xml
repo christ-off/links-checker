@@ -19,6 +19,8 @@
 		<sonar.organization>christ-off</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+		<!-- https://github.com/advisories/GHSA-jhq6-gfmj-v8fx (CVE-2026-10532), fixed in 1.5.35 -->
+		<logback.version>1.5.38</logback.version>
 	</properties>
 	<dependencies>
 		<dependency>
