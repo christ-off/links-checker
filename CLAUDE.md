@@ -42,16 +42,16 @@ The application is wired manually via `LinksCheckerConfig` (no component scannin
 ```
 CheckCommand → LinksCrawler
                  ├── ContentRetriever  (HTTP GET via java.net.http.HttpClient)
-                 ├── LinkRetriever     (extracts <a href> links from HTML via Jsoup)
+                 ├── LinkRetriever     (extracts <a href> links via Jsoup, resolved to absolute URLs)
                  └── LinksManager      (tracks URL state: null=unvisited, BORROWED=in-progress, PageResult=done)
 ```
 
 **Crawl flow** (`LinksCrawler.processSite`):
 1. Seed `LinksManager` with the start URL
-2. Loop: pick next unprocessed link, fetch it via `ContentRetriever`
-3. If the fetched URL is under `startUrl`, extract new links and add them to `LinksManager`
+2. Wave loop: drain all pending links, group them by host, fetch each group on its own virtual thread — hosts are checked in parallel, but each host sees at most one request at a time
+3. If a fetched URL is under `startUrl`, extract its links (absolute, fragment-stripped, http(s) only) and add them to `LinksManager`
 4. External links are fetched (to check status) but not crawled deeper
-5. Results stored as `PageResult(url, content/location, httpStatusCode)`
+5. Results stored as `PageResult(url, location-or-null, httpStatusCode)` — page bodies are parsed then dropped; only the `Location` of 3xx responses is kept
 
 **Status codes** (`LinksClassifier`):
 - `0` = "BORROWED" (in-progress sentinel)
@@ -60,6 +60,6 @@ CheckCommand → LinksCrawler
 ## Key Technical Details
 
 - Java 25, Spring Boot 4.1.0
-- `LinksManager` is stateful and shared — call `reset()` between crawls
+- `LinksManager` is stateful and shared — call `reset()` between crawls; it is only accessed from the crawl thread (workers return `FetchOutcome`s, state updates happen between waves)
 - 301/302 responses: `content` field holds the `Location` header value, not the body
 - Tests use OkHttp `MockWebServer` to simulate HTTP responses

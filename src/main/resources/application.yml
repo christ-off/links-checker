@@ -8,6 +8,8 @@ logging:
 
 links-checker:
   request-timeout-seconds: 30
+  max-request-attempts: 3
+  max-concurrent-hosts: 8
   sites-to-skip:
     - "https://www.babelio.com"
     - "https://www.7switch.com"
@@ -16,3 +18,4 @@ links-checker:
     - "https://www.telegraph.co.uk"
     - "https://www.youtube.com"
     - "https://www.badscience.net/"
+    - "https://shs.cairn.info"

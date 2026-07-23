@@ -3,6 +3,7 @@ package com.ptl.linkschecker;
 import com.ptl.linkschecker.commands.CheckCommand;
 import com.ptl.linkschecker.commands.LinkListCommand;
 import com.ptl.linkschecker.core.LinksCrawler;
+import com.ptl.linkschecker.domain.PageResult;
 import com.ptl.linkschecker.utils.ProgressCounter;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -11,6 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
+import java.util.Locale;
 
 @SpringBootApplication
 public class LinksCheckerApplication implements ApplicationRunner {
@@ -37,19 +40,22 @@ public class LinksCheckerApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		String website = args.getNonOptionArgs().getFirst();
+		List<String> websites = args.getNonOptionArgs();
+		if (websites.isEmpty()) {
+			IO.println("Usage: links-checker <website>");
+			System.exit(1);
+		}
 		Instant start = Instant.now();
-		String result = checkCommand.check(website);
+		String result = checkCommand.check(websites.getFirst());
 		IO.println(result);
 		Duration elapsed = Duration.between(start, Instant.now());
-		long seconds = elapsed.toSeconds();
-		int linkCount = linksCrawler.getLinks().size();
-		long linksPerSecond = seconds > 0 ? linkCount / seconds : linkCount;
-		IO.println("Time: " + seconds + "s | Links/s: " + linksPerSecond);
+		List<PageResult> links = linksCrawler.getLinks();
+		double linksPerSecond = links.size() * 1000.0 / Math.max(1, elapsed.toMillis());
+		IO.println("Time: " + elapsed.toSeconds() + "s | Links/s: " + String.format(Locale.ROOT, "%.1f", linksPerSecond));
 		progressCounter.printHostStats(linksCrawler.getQueriesPerHost());
 		IO.println("--- BAD LINKS ---");
-		IO.println(linkListCommand.badLinks());
+		IO.println(linkListCommand.badLinks(links));
 		IO.println("--- MOVED LINKS ---");
-		IO.println(linkListCommand.movedLinks());
+		IO.println(linkListCommand.movedLinks(links));
 	}
 }

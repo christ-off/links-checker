@@ -14,6 +14,11 @@ public class UrlUtils {
         }
     }
 
+    public static boolean isHttpUrl(String url) {
+        String lower = url.toLowerCase(java.util.Locale.ROOT);
+        return lower.startsWith("http://") || lower.startsWith("https://");
+    }
+
     public static String extractHost(String url) {
         try {
             String host = URI.create(url).getHost();

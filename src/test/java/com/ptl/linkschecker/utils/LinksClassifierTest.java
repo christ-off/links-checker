@@ -32,6 +32,26 @@ class LinksClassifierTest {
     }
 
     @Test
+    void isGoodLink_200() {
+        assertTrue(LinksClassifier.isGoodLink(200));
+    }
+
+    @Test
+    void isGoodLink_204() {
+        assertTrue(LinksClassifier.isGoodLink(204));
+    }
+
+    @Test
+    void isGoodLink_rejects_301() {
+        assertFalse(LinksClassifier.isGoodLink(301));
+    }
+
+    @Test
+    void isGoodLink_rejects_404() {
+        assertFalse(LinksClassifier.isGoodLink(404));
+    }
+
+    @Test
     void isBadLink_404() {
         assertTrue(LinksClassifier.isBadLink(404));
     }

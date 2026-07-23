@@ -29,6 +29,7 @@ public class SkippedSites {
                 }
             }
             catch (IllegalArgumentException _) {
+                // unparseable configured site: nothing to skip
             }
         }
     }

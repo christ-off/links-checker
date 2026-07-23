@@ -58,7 +58,35 @@ class LinkRetrieverImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1,result.size(), "Must retrieve one link");
-        Assertions.assertEquals("/content", result.getFirst());
+        Assertions.assertEquals("https://www.example.com/content", result.getFirst());
+    }
+
+    @Test
+    void should_resolve_relative_link_against_page_url(){
+
+        PageResult subPage = new PageResult("https://www.example.com/posts/",
+                "<html><body><a href=\"article.html\">Article</a></body></html>",
+                200);
+
+        List<String> result = tested.retrieveBodyLinks(subPage);
+
+        Assertions.assertEquals(List.of("https://www.example.com/posts/article.html"), result);
+    }
+
+    @Test
+    void should_ignore_non_http_links(){
+
+        PageResult simple = new PageResult("https://www.example.com",
+                "<html><body>"
+                        + "<a href=\"mailto:someone@example.com\">Mail</a>"
+                        + "<a href=\"javascript:void(0)\">JS</a>"
+                        + "<a href=\"tel:+123456\">Call</a>"
+                        + "</body></html>",
+                200);
+
+        List<String> result = tested.retrieveBodyLinks(simple);
+
+        Assertions.assertTrue(result.isEmpty(), "Must only keep http(s) links");
     }
 
     @Test

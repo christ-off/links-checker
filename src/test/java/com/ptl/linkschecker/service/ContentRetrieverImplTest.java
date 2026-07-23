@@ -24,7 +24,7 @@ class ContentRetrieverImplTest {
     @BeforeEach
     void init() {
         this.mockWebServer = new MockWebServer();
-        this.tested = new ContentRetriever(HttpClient.newHttpClient(), Duration.ofMillis(200));
+        this.tested = new ContentRetriever(HttpClient.newHttpClient(), Duration.ofMillis(200), 1);
     }
 
     @Test
@@ -93,6 +93,54 @@ class ContentRetrieverImplTest {
         PageResult result = tested.retrievePageContent(this.mockWebServer.url("/").toString());
 
         Assertions.assertEquals(408, result.httpStatusCode());
+
+        this.mockWebServer.shutdown();
+    }
+
+    @Test
+    void should_retry_transient_server_error_and_succeed() throws IOException, InterruptedException {
+        ContentRetriever retryingRetriever = new ContentRetriever(HttpClient.newHttpClient(), Duration.ofSeconds(5), 3);
+
+        this.mockWebServer.enqueue(new MockResponse().setResponseCode(503));
+        this.mockWebServer.enqueue(new MockResponse().setBody("recovered"));
+        this.mockWebServer.start();
+
+        PageResult result = retryingRetriever.retrievePageContent(this.mockWebServer.url("/").toString());
+
+        Assertions.assertEquals(200, result.httpStatusCode());
+        Assertions.assertEquals("recovered", result.content());
+        Assertions.assertEquals(2, this.mockWebServer.getRequestCount());
+
+        this.mockWebServer.shutdown();
+    }
+
+    @Test
+    void should_give_up_and_return_last_status_after_exhausting_retries() throws IOException, InterruptedException {
+        ContentRetriever retryingRetriever = new ContentRetriever(HttpClient.newHttpClient(), Duration.ofSeconds(5), 2);
+
+        this.mockWebServer.enqueue(new MockResponse().setResponseCode(503));
+        this.mockWebServer.enqueue(new MockResponse().setResponseCode(503));
+        this.mockWebServer.start();
+
+        PageResult result = retryingRetriever.retrievePageContent(this.mockWebServer.url("/").toString());
+
+        Assertions.assertEquals(503, result.httpStatusCode());
+        Assertions.assertEquals(2, this.mockWebServer.getRequestCount());
+
+        this.mockWebServer.shutdown();
+    }
+
+    @Test
+    void should_not_retry_permanent_client_errors() throws IOException, InterruptedException {
+        ContentRetriever retryingRetriever = new ContentRetriever(HttpClient.newHttpClient(), Duration.ofSeconds(5), 3);
+
+        this.mockWebServer.enqueue(new MockResponse().setResponseCode(404));
+        this.mockWebServer.start();
+
+        PageResult result = retryingRetriever.retrievePageContent(this.mockWebServer.url("/").toString());
+
+        Assertions.assertEquals(404, result.httpStatusCode());
+        Assertions.assertEquals(1, this.mockWebServer.getRequestCount());
 
         this.mockWebServer.shutdown();
     }

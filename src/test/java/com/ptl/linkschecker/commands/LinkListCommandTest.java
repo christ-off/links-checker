@@ -1,36 +1,25 @@
 package com.ptl.linkschecker.commands;
 
-import com.ptl.linkschecker.core.LinksCrawler;
 import com.ptl.linkschecker.domain.PageResult;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class LinkListCommandTest {
 
-    @Mock
-    LinksCrawler linksCrawler;
-
-    @InjectMocks
-    LinkListCommand tested;
+    LinkListCommand tested = new LinkListCommand();
 
     @Test
     void should_list_bad_links() {
-        when(linksCrawler.getLinks()).thenReturn(List.of(
+        List<PageResult> links = List.of(
                 new PageResult("https://ok.com", "ok", 200),
                 new PageResult("https://bad.com", null, 404),
                 new PageResult("https://error.com", null, 500)
-        ));
+        );
 
-        String result = tested.badLinks();
+        String result = tested.badLinks(links);
 
         assertTrue(result.contains("https://bad.com"));
         assertTrue(result.contains("404"));
@@ -41,34 +30,31 @@ class LinkListCommandTest {
 
     @Test
     void should_return_empty_string_when_no_bad_links() {
-        when(linksCrawler.getLinks()).thenReturn(List.of(
-                new PageResult("https://ok.com", "ok", 200)
-        ));
+        List<PageResult> links = List.of(new PageResult("https://ok.com", "ok", 200));
 
-        assertEquals("", tested.badLinks());
+        assertEquals("", tested.badLinks(links));
     }
 
     @Test
-    void should_list_moved_links() {
-        when(linksCrawler.getLinks()).thenReturn(List.of(
+    void should_list_moved_links_with_their_target() {
+        List<PageResult> links = List.of(
                 new PageResult("https://ok.com", "ok", 200),
                 new PageResult("https://moved.com", "https://new.com", 301),
-                new PageResult("https://temp.com", "https://other.com", 302)
-        ));
+                new PageResult("https://temp.com", null, 302)
+        );
 
-        String result = tested.movedLinks();
+        String result = tested.movedLinks(links);
 
-        assertTrue(result.contains("https://moved.com"));
+        assertTrue(result.contains("https://moved.com -> https://new.com"));
         assertTrue(result.contains("https://temp.com"));
+        assertFalse(result.contains("https://temp.com -> "));
         assertFalse(result.contains("https://ok.com"));
     }
 
     @Test
     void should_return_empty_string_when_no_redirects() {
-        when(linksCrawler.getLinks()).thenReturn(List.of(
-                new PageResult("https://ok.com", "ok", 200)
-        ));
+        List<PageResult> links = List.of(new PageResult("https://ok.com", "ok", 200));
 
-        assertEquals("", tested.movedLinks());
+        assertEquals("", tested.movedLinks(links));
     }
 }
