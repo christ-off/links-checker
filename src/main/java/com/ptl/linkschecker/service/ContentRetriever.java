@@ -18,18 +18,27 @@ public class ContentRetriever {
 
     private static final Duration RETRY_BACKOFF = Duration.ofMillis(300);
 
+    private static final String DEFAULT_USER_AGENT =
+            "Mozilla/5.0 (X11; Linux x86_64; rv:143.0) Gecko/20100101 Firefox/143.0";
+
     private final HttpClient httpClient;
     private final Duration timeout;
     private final int maxAttempts;
+    private final String userAgent;
 
     public ContentRetriever(HttpClient httpClient, Duration timeout) {
-        this(httpClient, timeout, 3);
+        this(httpClient, timeout, 3, DEFAULT_USER_AGENT);
     }
 
     public ContentRetriever(HttpClient httpClient, Duration timeout, int maxAttempts) {
+        this(httpClient, timeout, maxAttempts, DEFAULT_USER_AGENT);
+    }
+
+    public ContentRetriever(HttpClient httpClient, Duration timeout, int maxAttempts, String userAgent) {
         this.httpClient = httpClient;
         this.timeout = timeout;
         this.maxAttempts = maxAttempts;
+        this.userAgent = userAgent;
     }
 
     public PageResult retrievePageContent(String url) throws InterruptedException {
@@ -41,8 +50,7 @@ public class ContentRetriever {
                         .uri(java.net.URI.create(url))
                         .GET()
                         .timeout(timeout)
-                        .setHeader("User-Agent",
-                                "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0")
+                        .setHeader("User-Agent", userAgent)
                         .build();
                 HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
                 if (isTransientFailure(response.statusCode()) && !lastAttempt) {

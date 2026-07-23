@@ -21,7 +21,8 @@ public class LinksCheckerConfig {
 
     @Bean
     public ContentRetriever contentRetriever(HttpClient client, LinksCheckerProperties props) {
-        return new ContentRetriever(client, Duration.ofSeconds(props.requestTimeoutSeconds()), props.maxRequestAttempts());
+        return new ContentRetriever(client, Duration.ofSeconds(props.requestTimeoutSeconds()),
+                props.maxRequestAttempts(), props.userAgent());
     }
 
     @Bean
