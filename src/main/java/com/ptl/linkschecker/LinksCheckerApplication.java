@@ -46,6 +46,7 @@ public class LinksCheckerApplication implements ApplicationRunner {
 			System.exit(1);
 		}
 		Instant start = Instant.now();
+		IO.println("Legend: . = ok | 4 = bad (4xx) | 5 = bad (5xx) | I = internal link | s = skipped");
 		String result = checkCommand.check(websites.getFirst());
 		IO.println(result);
 		Duration elapsed = Duration.between(start, Instant.now());
