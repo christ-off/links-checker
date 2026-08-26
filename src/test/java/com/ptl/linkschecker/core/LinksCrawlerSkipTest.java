@@ -73,7 +73,7 @@ class LinksCrawlerSkipTest {
         assertEquals(2, links.size());
 
         // Verify skipped tick was called exactly once
-        verify(progressCounter, times(1)).tick(anyInt(), anyBoolean(), eq(true));
+        verify(progressCounter, times(1)).tick(anyInt(), anyBoolean(), eq(true), anyBoolean());
     }
 
     @Test
@@ -94,6 +94,6 @@ class LinksCrawlerSkipTest {
         assertEquals(2, links.size());
 
         // No skipped ticks
-        verify(progressCounter, never()).tick(anyInt(), anyBoolean(), eq(true));
+        verify(progressCounter, never()).tick(anyInt(), anyBoolean(), eq(true), anyBoolean());
     }
 }

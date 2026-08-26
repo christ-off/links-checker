@@ -57,4 +57,26 @@ class LinkListCommandTest {
 
         assertEquals("", tested.movedLinks(links));
     }
+
+    @Test
+    void should_list_internal_links_with_percent() {
+        List<PageResult> links = List.of(
+                new PageResult("https://site.com/a%20b", "ok", 200),
+                new PageResult("https://site.com/plain", "ok", 200),
+                new PageResult("https://other.com/x%20y", "ok", 200)
+        );
+
+        String result = tested.internalLinksWithPercent(links, "https://site.com");
+
+        assertTrue(result.contains("https://site.com/a%20b"));
+        assertFalse(result.contains("https://site.com/plain"));
+        assertFalse(result.contains("https://other.com/x%20y"));
+    }
+
+    @Test
+    void should_return_empty_string_when_no_internal_percent_links() {
+        List<PageResult> links = List.of(new PageResult("https://site.com/plain", "ok", 200));
+
+        assertEquals("", tested.internalLinksWithPercent(links, "https://site.com"));
+    }
 }

@@ -7,10 +7,10 @@ public class ProgressCounter {
     private static final int MAX_COLS = 100;
 
     // synchronized: ticks come from concurrent crawl threads
-    public synchronized void tick(int httpStatusCode, boolean internal, boolean skipped) {
+    public synchronized void tick(int httpStatusCode, boolean internal, boolean skipped, boolean hasPercent) {
         String symbol;
         if (internal) {
-            symbol = "I";
+            symbol = hasPercent ? "%" : "I";
         } else if (skipped) {
             symbol = "s";
         } else {

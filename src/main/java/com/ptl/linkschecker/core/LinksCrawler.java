@@ -65,7 +65,7 @@ public class LinksCrawler {
         String url;
         while ((url = linksManager.getNextUnProcessedLink()) != null) {
             if (skippedSites.isSkipped(url)) {
-                progressCounter.tick(0, false, true);
+                progressCounter.tick(0, false, true, false);
             } else {
                 batch.add(url);
             }
@@ -121,7 +121,7 @@ public class LinksCrawler {
             // keep only the redirect Location; retaining page bodies would hold the whole site in memory
             String location = LinksClassifier.isRedirectLink(pageResult.httpStatusCode()) ? pageResult.content() : null;
             outcomes.add(new FetchOutcome(url, location, pageResult.httpStatusCode(), newLinks));
-            progressCounter.tick(pageResult.httpStatusCode(), internal, false);
+            progressCounter.tick(pageResult.httpStatusCode(), internal, false, url.contains("%"));
         }
         return outcomes;
     }

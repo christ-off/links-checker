@@ -46,8 +46,9 @@ public class LinksCheckerApplication implements ApplicationRunner {
 			System.exit(1);
 		}
 		Instant start = Instant.now();
-		IO.println("Legend: . = ok | 4 = bad (4xx) | 5 = bad (5xx) | I = internal link | s = skipped");
-		String result = checkCommand.check(websites.getFirst());
+		IO.println("Legend: . = ok | 4 = bad (4xx) | 5 = bad (5xx) | I = internal link | % = internal link with % | s = skipped");
+		String startUrl = websites.getFirst();
+		String result = checkCommand.check(startUrl);
 		IO.println(result);
 		Duration elapsed = Duration.between(start, Instant.now());
 		List<PageResult> links = linksCrawler.getLinks();
@@ -58,5 +59,7 @@ public class LinksCheckerApplication implements ApplicationRunner {
 		IO.println(linkListCommand.badLinks(links));
 		IO.println("--- MOVED LINKS ---");
 		IO.println(linkListCommand.movedLinks(links));
+		IO.println("--- INTERNAL LINKS WITH % ---");
+		IO.println(linkListCommand.internalLinksWithPercent(links, startUrl));
 	}
 }

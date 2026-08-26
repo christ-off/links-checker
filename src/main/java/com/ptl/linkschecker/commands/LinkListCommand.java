@@ -23,4 +23,12 @@ public class LinkListCommand {
                 .map(r -> r.content() == null ? r.url() : r.url() + " -> " + r.content())
                 .collect(Collectors.joining("\n"));
     }
+
+    public String internalLinksWithPercent(List<PageResult> links, String startUrl) {
+        return links.stream()
+                .filter(r -> r.url().startsWith(startUrl))
+                .filter(r -> r.url().contains("%"))
+                .map(PageResult::url)
+                .collect(Collectors.joining("\n"));
+    }
 }
