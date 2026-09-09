@@ -79,4 +79,29 @@ class LinkListCommandTest {
 
         assertEquals("", tested.internalLinksWithPercent(links, "https://site.com"));
     }
+
+    @Test
+    void should_list_internal_pages_without_trailing_slash() {
+        List<PageResult> links = List.of(
+                new PageResult("https://site.com/about", "ok", 200),
+                new PageResult("https://site.com/blog/", "ok", 200),
+                new PageResult("https://site.com/style.css", "ok", 200),
+                new PageResult("https://site.com/broken-page", null, 404),
+                new PageResult("https://other.com/about", "ok", 200)
+        );
+
+        String result = tested.internalLinksWithoutTrailingSlash(links, "https://site.com");
+
+        assertEquals("https://site.com/about", result);
+    }
+
+    @Test
+    void should_return_empty_string_when_no_missing_trailing_slash() {
+        List<PageResult> links = List.of(
+                new PageResult("https://site.com/", "ok", 200),
+                new PageResult("https://site.com/blog/", "ok", 200)
+        );
+
+        assertEquals("", tested.internalLinksWithoutTrailingSlash(links, "https://site.com"));
+    }
 }

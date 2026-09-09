@@ -61,5 +61,7 @@ public class LinksCheckerApplication implements ApplicationRunner {
 		IO.println(linkListCommand.movedLinks(links));
 		IO.println("--- INTERNAL LINKS WITH % ---");
 		IO.println(linkListCommand.internalLinksWithPercent(links, startUrl));
+		IO.println("--- INTERNAL PAGES WITHOUT TRAILING / ---");
+		IO.println(linkListCommand.internalLinksWithoutTrailingSlash(links, startUrl));
 	}
 }
