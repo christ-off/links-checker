@@ -1,6 +1,6 @@
 package com.ptl.linkschecker.utils;
 
-public class LinksClassifier {
+public final class LinksClassifier {
 
     private LinksClassifier() {
     }

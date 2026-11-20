@@ -2,7 +2,7 @@ package com.ptl.linkschecker.utils;
 
 import java.net.URI;
 
-public class UrlUtils {
+public final class UrlUtils {
 
     private UrlUtils() {
     }

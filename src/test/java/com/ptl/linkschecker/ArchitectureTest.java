@@ -1,0 +1,67 @@
+package com.ptl.linkschecker;
+
+import com.enofex.taikai.core.ClassCriteria;
+import com.enofex.taikai.Taikai;
+import com.enofex.taikai.spring.BootConfigurer;
+import com.tngtech.archunit.core.domain.JavaModifier;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+
+class ArchitectureTest {
+
+    @Test
+    void shouldFulfillConstraints() {
+        Taikai.builder()
+                .namespace("com.ptl.linkschecker")
+                .failOnEmpty(false)
+                .java(java -> java
+                        .noUsageOfDeprecatedAPIs()
+                        .noUsageOfSystemOutOrErr()
+                        .fieldsShouldNotBePublic()
+                        .finalClassesShouldNotHaveProtectedMembers()
+                        .methodsShouldNotDeclareGenericExceptions()
+                        .utilityClassesShouldBeFinalAndHavePrivateConstructor()
+                        .serialVersionUIDFieldsShouldBeStaticFinalLong()
+                        .classesShouldImplementHashCodeAndEquals()
+                        .imports(imports -> imports
+                                .shouldNotImport(ClassCriteria.inPackage("..internal..")))
+                        .naming(naming -> naming
+                                .packagesShouldMatchDefault()
+                                .classesShouldNotMatch(".*Impl")
+                                .enumConstantsShouldFollowConventions()
+                                .interfacesShouldNotHavePrefixI()))
+                .logging(logging -> logging
+                        .loggersShouldFollowConventions(Logger.class, "log", List.of(JavaModifier.PRIVATE, JavaModifier.FINAL)))
+                .test(test -> test
+                        .junit(junit -> junit
+                                .classesShouldEndWithTest()
+                                .classesShouldBePackagePrivate(ClassCriteria.nameMatching(".*Test"))
+                                .classesShouldNotBeAnnotatedWithDisabled()
+                                .methodsShouldBePackagePrivate()
+                                .methodsShouldNotBeAnnotatedWithDisabled()
+                                .methodsShouldContainAssertionsOrVerifications()))
+                .spring(spring -> spring
+                        .noAutowiredFields()
+                        .noSelfInvocationOfProxiedMethods()
+                        .boot(BootConfigurer::applicationClassShouldResideInPackage)
+                        .controllers(controllers -> controllers
+                                .namesShouldEndWithController()
+                                .shouldNotDependOnOtherControllers()
+                                .shouldNotDependOnRepositories())
+                        .services(services -> services
+                                .namesShouldEndWithService()
+                                .shouldBeAnnotatedWithService()
+                                .shouldNotDependOnControllers())
+                        .repositories(repositories -> repositories
+                                .namesShouldEndWithRepository()
+                                .shouldBeAnnotatedWithRepository()
+                                .shouldNotDependOnControllers())
+                        .transactional(transactional -> transactional
+                                .methodsShouldBePublic()
+                                .shouldNotBeSelfInvoked()
+                                .shouldNotBeUsedInControllers()))
+                .build()
+                .checkAll();
+    }
+}
