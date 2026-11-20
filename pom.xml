@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.1.2</version>
+		<version>4.2.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ptl</groupId>
@@ -19,8 +19,7 @@
 		<sonar.organization>christ-off</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
-		<!-- https://github.com/advisories/GHSA-jhq6-gfmj-v8fx (CVE-2026-10532), fixed in 1.5.35 -->
-		<logback.version>1.5.38</logback.version>
+		<taikai.version>3.0.0</taikai.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -53,6 +52,12 @@
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>mockwebserver</artifactId>
 			<version>5.5.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.enofex</groupId>
+			<artifactId>taikai</artifactId>
+			<version>${taikai.version}</version>
 			<scope>test</scope>
 		</dependency>
     </dependencies>
